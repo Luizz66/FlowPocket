@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  HomeView.swift
 //  FlowPocket
 //
 //  Created by Luiz Gustavo Barros Campos on 19/02/26.
@@ -8,22 +8,26 @@
 import SwiftUI
 import CoreData
 
-struct ContentView: View {
+struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
+        sortDescriptors: [NSSortDescriptor(keyPath: \Transaction.date, ascending: true)],
+        animation: .default
+    ) private var transactions: FetchedResults<Transaction>
 
     var body: some View {
         NavigationView {
             List {
-                ForEach(items) { item in
+                ForEach(transactions) { trans in
                     NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
+                        Text("Adicionado em: \(trans.date!, formatter: itemFormatter)")
+                        Text("Name: \(trans.name!)")
+                        Text("Tipo: \(trans.type!)")
+                        Text("Valor: \(trans.value!)")
+                        Text("Categoria: \(trans.category!)")
                     } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+                        Text(trans.date!, formatter: itemFormatter)
                     }
                 }
                 .onDelete(perform: deleteItems)
@@ -44,14 +48,16 @@ struct ContentView: View {
 
     private func addItem() {
         withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+            let newItem = Transaction(context: viewContext)
+            newItem.date = Date()
+            newItem.name = "Teste"
+            newItem.type = "Gasto"
+            newItem.value = NSDecimalNumber(decimal: Decimal(50.00))
+            newItem.category = "Mercado"
 
             do {
                 try viewContext.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
@@ -60,13 +66,11 @@ struct ContentView: View {
 
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
+            offsets.map { transactions[$0] }.forEach(viewContext.delete)
+            
             do {
                 try viewContext.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
@@ -81,6 +85,13 @@ private let itemFormatter: DateFormatter = {
     return formatter
 }()
 
-#Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+struct HomeView_Preview: PreviewProvider {
+    static let previewContext = CoreDataManager.shared.container.viewContext
+    
+    static var previews: some View {
+        NavigationView { 
+            HomeView()
+                .environment(\.managedObjectContext, previewContext)            
+        }
+    }
 }

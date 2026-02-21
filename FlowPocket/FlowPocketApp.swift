@@ -10,12 +10,12 @@ import CoreData
 
 @main
 struct FlowPocketApp: App {
-    let persistenceController = PersistenceController.shared
+    let coreDataManager = CoreDataManager.shared
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            HomeView()
+                .environment(\.managedObjectContext, coreDataManager.container.viewContext)
         }
     }
 }
