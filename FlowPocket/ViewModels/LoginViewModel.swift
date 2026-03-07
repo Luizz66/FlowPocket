@@ -43,4 +43,9 @@ class LoginViewModel: ObservableObject {
     func logout() {
         try? Auth.auth().signOut()
     }
+    
+    // MARK: - validations
+    private func validateEmail(_ email: String) -> Bool {
+        return email.contains("@")
+    }
 }
