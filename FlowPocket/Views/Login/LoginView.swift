@@ -11,7 +11,9 @@ struct LoginView: View {
     @State private var emailTxt: String = ""
     @State private var senhaTxt: String = ""
     
-    @StateObject private var vm = LoginViewModel()
+    @State private var isValid: Bool = true
+    
+    @StateObject private var vm = LoginViewModel(service: LoginService())
     
     var body: some View {
         VStack {
@@ -75,7 +77,9 @@ struct LoginView: View {
                     .shadow(color: .black.opacity(0.6), radius: 2, x: 1.5, y: 1.8)
                     
                     CustomBtn(txt: "Login", colorTxt: .overlayLight, colorBtn: .mainBlue) {
-                        
+                        if emailTxt != "" && senhaTxt != "" {
+                            
+                        }
                     }
                     
                     Button("Não Possui Conta? Inscreva-se") {
@@ -100,10 +104,10 @@ struct LoginView: View {
             )
         }
         .background(Color.mainBlue)
+        .ignoresSafeArea()
     }
 }
 
 #Preview {
     LoginView()
-        .ignoresSafeArea()
 }
