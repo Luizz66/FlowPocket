@@ -1,5 +1,5 @@
 //
-//  LoginViewModel.swift
+//  AuthenticationViewModel.swift
 //  FlowPocket
 //
 //  Created by Luiz Gustavo Barros Campos on 01/03/26.
@@ -9,7 +9,7 @@ import Combine
 import FirebaseAuth
 
 @MainActor
-class LoginViewModel: ObservableObject {
+class AuthenticationViewModel: ObservableObject {
     @Published var isLoggedIn: Bool = false
     
     @Published var sucessMessage: String = ""
@@ -17,6 +17,8 @@ class LoginViewModel: ObservableObject {
     
     @Published var sucess: Bool = false
     @Published var hasError: Bool = false
+    
+    @Published var fieldEmpty: Bool?
     
     private let service: AuthenticationService
     
@@ -64,7 +66,7 @@ class LoginViewModel: ObservableObject {
             } catch {
                 self.hasError = true
                 self.errorMessage = "Erro ao logar, verifique os dados e tente novamente!"
-                print("❌ Erro: \(error.localizedDescription)")
+                print("❌ Erro: \(error)")
                 self.isLoggedIn = false
             }
         }
@@ -99,9 +101,13 @@ class LoginViewModel: ObservableObject {
             } catch {
                 self.hasError = true
                 self.errorMessage = error.localizedDescription
-                print("❌Erro: \(error.localizedDescription)")
+                print("❌Erro: \(error)")
             }
         }
+    }
+    
+    func differentPassword() {
+        self.errorMessage = "Ops,as Senhas são diferentes, digite as mesmas senhas!"
     }
     
     private func validateEmail(_ email: String) -> Bool {

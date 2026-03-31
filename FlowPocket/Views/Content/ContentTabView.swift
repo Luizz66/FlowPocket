@@ -16,6 +16,26 @@ struct ContentTabView: View {
                 .tabItem {
                     Image(systemName: "house")
                 }
+            
+            TransactionView()
+                .tabItem {
+                    Image(systemName: "arrow.left.arrow.right")
+                }
+            
+            AddNewTransactionView()
+                .tabItem {
+                    Image(systemName: "plus.app.fill")
+                }
+            
+            ChartsView()
+                .tabItem {
+                    Image(systemName: "chart.bar.fill")
+                }
+            
+            ConfigurationView()
+                .tabItem {
+                    Image(systemName: "gearshape.fill")
+                }
         }
     }
 }

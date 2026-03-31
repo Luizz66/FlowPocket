@@ -22,6 +22,7 @@ struct CustomBtn: View {
                 .font(.myFont(style: .title2, weight: .medium))
                 .foregroundColor(colorTxt)
                 .shadow(color: .black.opacity(0.2), radius: 2, x: 1, y: 1.5)
+                .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 18)
@@ -44,7 +45,7 @@ struct CustomBtn: View {
 #Preview {
     VStack {
         CustomBtn(txt: "Login", colorTxt: .white, colorBtn: .mainBlue) {
-            
+            print("Pressed")
         }
     }
     .padding()

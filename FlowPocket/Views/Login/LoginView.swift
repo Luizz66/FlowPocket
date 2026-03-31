@@ -9,32 +9,36 @@ import SwiftUI
 
 struct LoginView: View {
     @State private var emailTxt: String = ""
-    @State private var senhaTxt: String = ""
+    @State private var passwordTxt: String = ""
+    @State private var isValid: Bool = false
     
-    @State private var isValid: Bool = true
+    @StateObject private var vm = AuthenticationViewModel(service: AuthenticationService())
     
-    @StateObject private var vm = LoginViewModel(service: AuthenticationService())
+    @State private var goRegister: Bool = false
     
     var body: some View {
-        VStack {
-            iconView()
-            VStack {
-                loginTitle()
-                VStack(spacing: 20) {
-                    inputsLogin()
-                    btnLogin()
-                    btnRegister()
-                }
-                .font(.myFont(style: .body, weight: .medium))
-                .padding(20)
-            }
-            .background(Color.bgLight)
-            .customClipShapeRounded()
-        }
-        .background(Color.mainBlue)
-        .ignoresSafeArea()
-        .navigationDestination(isPresented: $vm.sucess) {
+        if vm.isLoggedIn {
             ContentTabView()
+        } else {
+            NavigationStack {
+                VStack {
+                    iconView()
+                    VStack {
+                        loginTitle()
+                        VStack(spacing: 20) {
+                            inputsLogin()
+                            btnLogin()
+                            btnRegister()
+                        }
+                        .font(.myFont(style: .body, weight: .medium))
+                        .padding(20)
+                    }
+                    .background(Color.bgLight)
+                    .customClipShapeRounded()
+                }
+                .background(Color.mainBlue)
+                .ignoresSafeArea()
+            }
         }
     }
     
@@ -90,28 +94,30 @@ struct LoginView: View {
             VStack(alignment: .leading) {
                 Text("E-mail")
                     .padding(.bottom, 6)
-                TextField("Digite seu e-mail", text: $emailTxt)
+                customTxtField($emailTxt, fill: vm.fieldEmpty, prompt: "Digite seu e-mail")
                     .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.never)
             }
             
             VStack(alignment: .leading) {
                 Text("Senha")
                     .padding(.bottom, 6)
-                SecureField("Digite sua senha", text: $senhaTxt)
+                customSecureField($passwordTxt, fill: vm.fieldEmpty, prompt: "Digite sua senha")
             }
         }
-        .padding(10)
-        .background(Color.overlayLight)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(color: .black.opacity(0.6), radius: 2, x: 1.5, y: 1.8)
+        .customInputStyle()
+        .textInputAutocapitalization(.never)
     }
     
     @ViewBuilder
     func btnLogin() -> some View {
         CustomBtn(txt: "Login", colorTxt: .overlayLight, colorBtn: .mainBlue) {
-            if emailTxt != "" && senhaTxt != "" {
-                vm.login(email: emailTxt, password: senhaTxt)
+            if emailTxt != "" && passwordTxt != "" {
+                vm.login(email: emailTxt, password: passwordTxt)
+                if vm.sucess == true {
+                    print("✅Login bem sucedido \(vm.sucessMessage)")
+                }
+            } else {
+                vm.fieldEmpty = true
             }
         }
         .alert("Erro", isPresented: $vm.hasError) {
@@ -119,20 +125,21 @@ struct LoginView: View {
         } message: {
             Text(vm.errorMessage)
         }
-        .alert("Sucesso", isPresented: $vm.sucess) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(vm.sucessMessage)
+        .navigationDestination(isPresented: $vm.sucess) {
+            ContentTabView()
         }
     }
     
     @ViewBuilder
     func btnRegister() -> some View {
         Button("Não Possui Conta? Inscreva-se") {
-            
+            goRegister = true
         }
         .foregroundColor(.black)
         .padding(.bottom, 40)
+        .navigationDestination(isPresented: $goRegister) {
+            RegisterView()
+        }
     }
 }
 
