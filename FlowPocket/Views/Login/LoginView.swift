@@ -33,7 +33,7 @@ struct LoginView: View {
                         .font(.myFont(style: .body, weight: .medium))
                         .padding(20)
                     }
-                    .background(Color.bgLight)
+                    .background(Color.bg)
                     .customClipShapeRounded()
                 }
                 .background(Color.mainBlue)
@@ -50,14 +50,14 @@ struct LoginView: View {
                 Image("ImgIcon")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: geo.size.width / 3.5)
+                    .frame(width: geo.size.width / 3.7)
                     .clipShape(
                         UnevenRoundedRectangle(
                             cornerRadii: .init(
                                 topLeading: 25,
-                                bottomLeading: 0,
+                                bottomLeading: 25,
                                 bottomTrailing: 25,
-                                topTrailing: 25
+                                topTrailing: 0
                             )
                         )
                     )
@@ -71,7 +71,7 @@ struct LoginView: View {
                                 topTrailing: 0
                             )
                         )
-                        .fill(Color.overlayLight)
+                        .fill(Color.backdrop)
                     )
                     .padding(.top, 32)
             }
@@ -110,7 +110,7 @@ struct LoginView: View {
     
     @ViewBuilder
     func btnLogin() -> some View {
-        CustomBtn(txt: "Login", colorTxt: .overlayLight, colorBtn: .mainBlue) {
+        CustomBtn(txt: "Login", colorTxt: .backdrop, colorBtn: .mainBlue) {
             if emailTxt != "" && passwordTxt != "" {
                 vm.login(email: emailTxt, password: passwordTxt)
                 if vm.sucess == true {
@@ -120,6 +120,8 @@ struct LoginView: View {
                 vm.fieldEmpty = true
             }
         }
+        .padding(.vertical, 20)
+        .padding(.bottom, 5)
         .alert("Erro", isPresented: $vm.hasError) {
             Button("OK", role: .cancel) { }
         } message: {

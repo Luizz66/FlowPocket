@@ -62,3 +62,5 @@ enum fontWeight {
     case semiBold
     case bold
 }
+
+//.font(.myFont(style: .largeTitle, weight: .regular))

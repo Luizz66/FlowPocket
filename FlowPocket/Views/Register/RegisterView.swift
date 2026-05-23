@@ -33,7 +33,7 @@ struct RegisterView: View {
                     .padding(.vertical)
                     .padding(.top, 45)
                 }
-                .background(Color.bgLight)
+                .background(Color.bg)
                 .customClipShapeRounded()
             }
             .background(Color.mainBlue)
@@ -48,7 +48,8 @@ struct RegisterView: View {
         Text("Inscreva-se")
             .font(.myFont(style: .largeTitle, weight: .regular))
             .padding(.vertical, 50)
-            .foregroundColor(.overlayLight)
+            .foregroundColor(.backdrop)
+        Spacer()
     }
     
     @ViewBuilder
@@ -82,7 +83,7 @@ struct RegisterView: View {
     
     @ViewBuilder
     func btnRegister() -> some View {
-        CustomBtn(txt: "Inscrever-se", colorTxt: .overlayLight, colorBtn: .mainBlue) {
+        CustomBtn(txt: "Inscrever-se", colorTxt: .backdrop, colorBtn: .mainBlue) {
             let fields = [emailTxt, passwordTxt, confirmPasswordTxt]
             if fields.allSatisfy({ !$0.isEmpty }) {
                 if passwordTxt == confirmPasswordTxt {
@@ -97,7 +98,8 @@ struct RegisterView: View {
                 vm.fieldEmpty = true
             }
         }
-        .padding(.top)
+        .padding(.vertical, 20)
+        .padding(.bottom, 5)
         .alert("Erro", isPresented: $vm.hasError) {
             Button("OK", role: .cancel) { }
         } message: {
