@@ -10,9 +10,13 @@ import SwiftUI
 struct LoginView: View {
     @State private var emailTxt: String = ""
     @State private var passwordTxt: String = ""
+    
+    @State private var passWordState: InputState = .neutral
+    @State private var emailState: InputState = .neutral
+    
     @State private var isValid: Bool = false
     
-    @StateObject private var vm = AuthenticationViewModel(service: AuthenticationService())
+    @StateObject private var vm = LoginViewModel(service: AuthenticationService())
     
     @State private var goRegister: Bool = false
     
@@ -22,13 +26,13 @@ struct LoginView: View {
         } else {
             NavigationStack {
                 VStack {
-                    iconView()
+                    IconView()
                     VStack {
-                        loginTitle()
+                        LoginTitleView()
                         VStack(spacing: 20) {
-                            inputsLogin()
-                            btnLogin()
-                            btnRegister()
+                            InputsLoginView()
+                            BtnLoginView()
+                            BtnRegisterView()
                         }
                         .font(.myFont(style: .body, weight: .medium))
                         .padding(20)
@@ -44,7 +48,7 @@ struct LoginView: View {
     
     // MARK: - ViewBuilders
     @ViewBuilder
-    func iconView() -> some View {
+    func IconView() -> some View {
         GeometryReader { geo in
             VStack {
                 Image("ImgIcon")
@@ -80,7 +84,7 @@ struct LoginView: View {
     }
     
     @ViewBuilder
-    func loginTitle() -> some View {
+    func LoginTitleView() -> some View {
         Spacer()
         Text("Login")
             .font(.myFont(style: .largeTitle, weight: .regular))
@@ -89,27 +93,30 @@ struct LoginView: View {
     }
     
     @ViewBuilder
-    func inputsLogin() -> some View {
+    func InputsLoginView() -> some View {
         Group {
             VStack(alignment: .leading) {
-                Text("E-mail")
-                    .padding(.bottom, 6)
-                customTxtField($emailTxt, fill: vm.fieldEmpty, prompt: "Digite seu e-mail")
-                    .keyboardType(.emailAddress)
+                CustomTextField(
+                    text: $emailTxt,
+                    placeholder: "E-mail",
+                    kind: .email,
+                    state: emailState
+                )
             }
             
             VStack(alignment: .leading) {
-                Text("Senha")
-                    .padding(.bottom, 6)
-                customSecureField($passwordTxt, fill: vm.fieldEmpty, prompt: "Digite sua senha")
+                CustomTextField(
+                    text: $passwordTxt,
+                    placeholder: "Senha",
+                    kind: .password(min: 6),
+                    state: passWordState
+                )
             }
         }
-        .customInputStyle()
-        .textInputAutocapitalization(.never)
     }
     
     @ViewBuilder
-    func btnLogin() -> some View {
+    func BtnLoginView() -> some View {
         CustomBtn(txt: "Login", colorTxt: .backdrop, colorBtn: .mainBlue) {
             if emailTxt != "" && passwordTxt != "" {
                 vm.login(email: emailTxt, password: passwordTxt)
@@ -127,13 +134,10 @@ struct LoginView: View {
         } message: {
             Text(vm.errorMessage)
         }
-        .navigationDestination(isPresented: $vm.sucess) {
-            ContentTabView()
-        }
     }
     
     @ViewBuilder
-    func btnRegister() -> some View {
+    func BtnRegisterView() -> some View {
         Button("Não Possui Conta? Inscreva-se") {
             goRegister = true
         }

@@ -19,7 +19,7 @@ struct FlowPocketApp: App {
     
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            RootView()
                 .environment(\.managedObjectContext, coreDataManager.container.viewContext)
         }
     }

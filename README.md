@@ -1,5 +1,5 @@
 - Personal Finance App iOS 
-- Swift | SwiftUI | Charts | CoreData
+- Swift | SwiftUI | Charts | CoreData | FirebaseAuthentication
 
 *Unpublished*
 

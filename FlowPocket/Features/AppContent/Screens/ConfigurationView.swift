@@ -8,8 +8,17 @@
 import SwiftUI
 
 struct ConfigurationView: View {
+    private let service = AuthenticationService()
+
     var body: some View {
-        Text("Configuration")
+        VStack {
+            Text("Configuration")
+
+            Button("Sair") {
+                service.logout()
+            }
+            .padding()
+        }
     }
 }
 

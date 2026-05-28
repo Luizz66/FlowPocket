@@ -12,21 +12,25 @@ struct RegisterView: View {
     @State private var passwordTxt: String = ""
     @State private var confirmPasswordTxt: String = ""
     
+    @State private var emailState: InputState = .neutral
+    @State private var passwordState: InputState = .neutral
+    @State private var confirmPasswordState: InputState = .neutral
+    
     @State private var isValid: Bool = true
     
-    @StateObject private var vm = AuthenticationViewModel(service: AuthenticationService())
+    @StateObject private var vm = RegisterViewModel(service: AuthenticationService())
     
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
         NavigationStack {
             VStack {
-                registerTitle()
+                RegisterTitleView()
                 VStack {
                     VStack(spacing: 20) {
-                        inputsRegister()
-                        btnRegister()
-                        btnHasAccount()
+                        InputsRegisterView()
+                        BtnRegisterView()
+                        BtnHasAccountView()
                     }
                     .font(.myFont(style: .body, weight: .medium))
                     .padding(20)
@@ -43,7 +47,7 @@ struct RegisterView: View {
     
     // MARK: - ViewBuilders
     @ViewBuilder
-    func registerTitle() -> some View {
+    func RegisterTitleView() -> some View {
         Spacer()
         Text("Inscreva-se")
             .font(.myFont(style: .largeTitle, weight: .regular))
@@ -53,42 +57,48 @@ struct RegisterView: View {
     }
     
     @ViewBuilder
-    func inputsRegister() -> some View {
+    func InputsRegisterView() -> some View {
         Group {
             VStack(alignment: .leading) {
-                Text("Email")
-                    .padding(.bottom, 6)
-                customTxtField($emailTxt, fill: vm.fieldEmpty, prompt: "Digite seu e-mail")
-                    .keyboardType(.emailAddress)
+                CustomTextField(
+                    text: $emailTxt,
+                    placeholder: "E-mail",
+                    kind: .email,
+                    state: emailState
+                )
             }
             
             VStack(alignment: .leading) {
-                Text("Senha")
-                    .padding(.bottom, 6)
-                customSecureField($passwordTxt, fill: vm.fieldEmpty, prompt: "Crie uma senha")
-                    .textContentType(.password)
+                CustomTextField(
+                    text: $passwordTxt,
+                    placeholder: "Senha",
+                    kind: .password(min: 6),
+                    state: passwordState
+                )
             }
             
             VStack(alignment: .leading) {
-                Text("Confirme sua senha")
-                    .padding(.bottom, 6)
-                customSecureField($confirmPasswordTxt, fill: vm.fieldEmpty, prompt: "Crie uma senha")
-                    .textContentType(.password)
+                CustomTextField(
+                    text: $confirmPasswordTxt,
+                    placeholder: "Confirme sua senha",
+                    kind: .password(min: 6),
+                    state: confirmPasswordState
+                )
             }
             
         }
         .textInputAutocapitalization(.never)
-        .customInputStyle()
     }
     
     @ViewBuilder
-    func btnRegister() -> some View {
+    func BtnRegisterView() -> some View {
         CustomBtn(txt: "Inscrever-se", colorTxt: .backdrop, colorBtn: .mainBlue) {
             let fields = [emailTxt, passwordTxt, confirmPasswordTxt]
             if fields.allSatisfy({ !$0.isEmpty }) {
                 if passwordTxt == confirmPasswordTxt {
                     vm.register(email: emailTxt, password: passwordTxt)
                     if vm.sucess == true {
+                        vm.accountCreatedNow = true
                         print("✅Inscrição bem sucedida \(vm.sucessMessage)")
                     }
                 } else {
@@ -105,13 +115,10 @@ struct RegisterView: View {
         } message: {
             Text(vm.errorMessage)
         }
-        .navigationDestination(isPresented: $vm.sucess) {
-            ContentTabView()
-        }
     }
     
     @ViewBuilder
-    func btnHasAccount() -> some View {
+    func BtnHasAccountView() -> some View {
         Button("Já possui conta? Entre") {
             dismiss()
         }
