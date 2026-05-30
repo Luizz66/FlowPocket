@@ -8,18 +8,9 @@
 import SwiftUI
 
 struct RegisterView: View {
-    @State private var emailTxt: String = ""
-    @State private var passwordTxt: String = ""
-    @State private var confirmPasswordTxt: String = ""
-    
-    @State private var emailState: InputState = .neutral
-    @State private var passwordState: InputState = .neutral
-    @State private var confirmPasswordState: InputState = .neutral
-    
-    @State private var isValid: Bool = true
-    
     @StateObject private var vm = RegisterViewModel(service: AuthenticationService())
     
+    @EnvironmentObject private var session: SessionViewModel
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -34,9 +25,9 @@ struct RegisterView: View {
                     }
                     .font(.myFont(style: .body, weight: .medium))
                     .padding(20)
-                    .padding(.vertical)
-                    .padding(.top, 45)
+                    .padding(.top, 65)
                 }
+                .padding(.bottom)
                 .background(Color.bg)
                 .customClipShapeRounded()
             }
@@ -51,69 +42,63 @@ struct RegisterView: View {
         Spacer()
         Text("Inscreva-se")
             .font(.myFont(style: .largeTitle, weight: .regular))
-            .padding(.vertical, 50)
-            .foregroundColor(.backdrop)
+            .padding(.vertical)
+            .foregroundColor(.white)
         Spacer()
     }
     
     @ViewBuilder
     func InputsRegisterView() -> some View {
-        Group {
-            VStack(alignment: .leading) {
-                CustomTextField(
-                    text: $emailTxt,
-                    placeholder: "E-mail",
-                    kind: .email,
-                    state: emailState
-                )
-            }
-            
-            VStack(alignment: .leading) {
-                CustomTextField(
-                    text: $passwordTxt,
-                    placeholder: "Senha",
-                    kind: .password(min: 6),
-                    state: passwordState
-                )
-            }
-            
-            VStack(alignment: .leading) {
-                CustomTextField(
-                    text: $confirmPasswordTxt,
-                    placeholder: "Confirme sua senha",
-                    kind: .password(min: 6),
-                    state: confirmPasswordState
-                )
-            }
-            
+        VStack(alignment: .leading) {
+            CustomTextField(
+                text: $vm.emailTxt,
+                placeholder: "E-mail",
+                kind: .email,
+                state: vm.emailState
+            )
         }
-        .textInputAutocapitalization(.never)
+        
+        VStack(alignment: .leading) {
+            CustomTextField(
+                text: $vm.passwordTxt,
+                placeholder: "Senha",
+                kind: .password(min: 6),
+                state: vm.passwordState
+            )
+        }
+        
+        VStack(alignment: .leading) {
+            CustomTextField(
+                text: $vm.confirmPasswordTxt,
+                placeholder: "Confirme sua senha",
+                kind: .password(min: 6),
+                state: vm.confirmPasswordState
+            )
+        }
     }
     
     @ViewBuilder
     func BtnRegisterView() -> some View {
-        CustomBtn(txt: "Inscrever-se", colorTxt: .backdrop, colorBtn: .mainBlue) {
-            let fields = [emailTxt, passwordTxt, confirmPasswordTxt]
-            if fields.allSatisfy({ !$0.isEmpty }) {
-                if passwordTxt == confirmPasswordTxt {
-                    vm.register(email: emailTxt, password: passwordTxt)
-                    if vm.sucess == true {
-                        vm.accountCreatedNow = true
-                        print("✅Inscrição bem sucedida \(vm.sucessMessage)")
-                    }
-                } else {
-                    vm.differentPassword()
-                }
-            } else {
-                vm.fieldEmpty = true
+        CustomBtn(txt: "Inscrever-se", colorBtn: .mainBlue) {
+            if vm.validateAll() {
+                session.isWaitingRegisterConfirmation = true
+                vm.register()
             }
         }
         .padding(.vertical, 20)
         .padding(.bottom, 5)
-        .alert("Erro", isPresented: $vm.hasError) {
+        
+        //Alerts
+        .alert("Erro ao criar conta!", isPresented: $vm.hasError) {
             Button("OK", role: .cancel) { }
         } message: {
             Text(vm.errorMessage)
+        }
+        .alert("Conta criada com sucesso!", isPresented: $vm.sucess) {
+            Button("Ir para o App") {
+                session.isWaitingRegisterConfirmation = false
+                session.isLoggedIn = true
+            }
         }
     }
     
@@ -122,11 +107,20 @@ struct RegisterView: View {
         Button("Já possui conta? Entre") {
             dismiss()
         }
-        .foregroundColor(.black)
+        .foregroundColor(.textPrimary)
         .padding(.bottom, 60)
     }
 }
 
-#Preview {
-    RegisterView()
+// MARK: - Preview
+struct RegisterView_Previews: PreviewProvider {
+    static var previews: some View {
+        RegisterView()
+            .previewDisplayName("Register Light Mode")
+            .preferredColorScheme(.light)
+        
+        RegisterView()
+            .previewDisplayName("Register Dark Mode")
+            .preferredColorScheme(.dark)
+    }
 }

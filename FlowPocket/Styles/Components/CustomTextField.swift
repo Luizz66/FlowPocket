@@ -124,7 +124,6 @@ struct CustomTextField_AllPreviews: PreviewProvider {
                 
                 CustomBtn(
                     txt: "Salvar",
-                    colorTxt: .primary,
                     colorBtn: .mainBlue
                 ) { validate() }
                 
@@ -165,12 +164,12 @@ struct CustomTextField_AllPreviews: PreviewProvider {
         Group {
             DemoView()
                 .previewDisplayName("Custom Text Field Light")
-                .background(Color(white: 0.95))
+                .background(Color.bg)
             
             DemoView()
                 .previewDisplayName("Custom Text Field Dark")
                 .preferredColorScheme(.dark)
-                .background(Color.backdrop)
+                .background(Color.bg)
         }
     }
 }

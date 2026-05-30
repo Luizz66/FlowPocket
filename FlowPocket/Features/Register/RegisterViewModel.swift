@@ -7,60 +7,85 @@
 
 import Combine
 import FirebaseAuth
+import SwiftUI
 
 @MainActor
 class RegisterViewModel: ObservableObject {
-    @Published var sucessMessage: String = ""
     @Published var errorMessage: String = ""
     
     @Published var sucess: Bool = false
     @Published var hasError: Bool = false
     
-    @Published var fieldEmpty: Bool?
-    
-    @Published var accountCreatedNow: Bool?
-    
     private let service: AuthenticationService
+    
+    //Inputs
+    @Published var emailTxt: String = ""
+    @Published var passwordTxt: String = ""
+    @Published var confirmPasswordTxt: String = ""
+    
+    @Published var emailState: InputState = .neutral
+    @Published var passwordState: InputState = .neutral
+    @Published var confirmPasswordState: InputState = .neutral
     
     init(service: AuthenticationService) {
         self.service = service
     }
     
-    func register(email: String, password: String) {
+    func register() {
         Task {
-            if !validateEmail(email) && !validadePassword(password) {
-                self.hasError = true
-                self.errorMessage = "E-mail e senha inválidos!"
-                return
-            }
-            
-            guard validateEmail(email) else {
-                self.hasError = true
-                self.errorMessage = "Favor inserir um e-mail válido!"
-                return
-            }
-            
-            guard validadePassword(password) else {
-                self.hasError = true
-                self.errorMessage = "A senha precisa ter pelo menos 6 caracteres!"
-                return
-            }
-            
             do {
-                let result = try await service.register(email: email, password: password)
+                let result = try await service.register(email: emailTxt, password: passwordTxt)
                 
-                self.sucessMessage = "Usário criado: \(result.user.uid)"
-                print("✅ Usário criado: \(result.user.uid)")
                 self.sucess = true
+                
+                print("✅ Usário criado com sucesso, ID: \(result.user.uid)")
             } catch {
-                self.hasError = true
-                self.errorMessage = error.localizedDescription
-                print("❌Erro: \(error)")
+                if validateAll() {
+                    self.hasError = true
+                    self.errorMessage = """
+                    Ops, algo deu errado ao criar o usuário :(
+                    Confira as informações e tente novamente!
+                    """
+                }
+                
+                print("❌Erro ao criar conta: \(error), Descrição: \(error.localizedDescription)")
             }
         }
     }
     
-    func differentPassword() {
-        self.errorMessage = "Ops,as Senhas são diferentes, digite as mesmas senhas!"
+    // MARK: - Validations
+    func validateAll() -> Bool {
+        var validate = false
+        
+        if InputValidator.isValid(emailTxt, for: .email) {
+            validate = true
+            emailState = .neutral
+        } else {
+            validate = false
+            emailState = .error(message: "Informe um E-mail válido. Ex: email@dominio.com")
+        }
+        
+        if InputValidator.isValid(passwordTxt, for: .password(min: 6)) {
+            validate = true
+            passwordState = .neutral
+        } else {
+            validate = false
+            passwordState = .error(message: "A senha deve ter no minímo 6 caracteres")
+        }
+        
+        if passwordTxt == confirmPasswordTxt {
+            if InputValidator.isValid(confirmPasswordTxt, for: .password(min: 6)) {
+                validate = true
+                confirmPasswordState = .neutral
+            } else {
+                validate = false
+                confirmPasswordState = .error(message: "A senha precisa ter no minímo 6 caracteres")
+            }
+        } else {
+            validate = false
+            confirmPasswordState = .error(message: "Senhas diferentes, digite a mesma senha em ambos os campos")
+        }
+        
+        return validate
     }
 }

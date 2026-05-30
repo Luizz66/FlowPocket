@@ -7,16 +7,20 @@
 
 import SwiftUI
 
+//Controle de Autenticação
 struct RootView: View {
     @StateObject private var session = SessionViewModel()
-
+    
     var body: some View {
         Group {
-            if session.isLoggedIn {
+            if session.isLoading {
+                ProgressView()
+            } else if session.isLoggedIn {
                 ContentTabView()
             } else {
                 LoginView()
             }
         }
+        .environmentObject(session)
     }
 }

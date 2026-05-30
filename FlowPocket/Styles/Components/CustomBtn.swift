@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CustomBtn: View {
     let txt: String
-    let colorTxt: Color
+    var colorTxt: Color? = .white
     let colorBtn: Color
     var tipTop: Bool?
     let action: () -> Void
@@ -23,7 +23,7 @@ struct CustomBtn: View {
                 .foregroundColor(colorTxt)
                 .shadow(color: .black.opacity(0.2), radius: 2, x: 1, y: 1.5)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, 12)
         }
         .buttonStyle(CustomPressStyle(colorBtn: colorBtn, tipTop: tipTop))
         .shadow(color: .black.opacity(0.6), radius: 2, x: 1.5, y: 1.8)
@@ -50,7 +50,7 @@ private struct CustomPressStyle: ButtonStyle {
                     )
                 )
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeInOut(duration: 0.20),
                        value: configuration.isPressed)
     }
@@ -62,15 +62,15 @@ private struct CustomBtnView_PreviewContainer: View {
         VStack {
             CustomBtn(
                 txt: "Login",
-                colorTxt: .bg,
+                colorTxt: .black,
                 colorBtn: .mainBlue
             ) { print("login") }
             
             //style tipBottom
             CustomBtn(
                 txt: "Deletar",
-                colorTxt: .white,
-                colorBtn: .tomato,
+                colorTxt: .purple,
+                colorBtn: .orange,
                 tipTop: false
             ) { }
         }
@@ -81,11 +81,11 @@ private struct CustomBtnView_PreviewContainer: View {
 struct CustomBtnView_Previews: PreviewProvider {
     static var previews: some View {
         CustomBtnView_PreviewContainer()
-            .previewDisplayName("Light Mode")
+            .previewDisplayName("Btn Light Mode")
             .preferredColorScheme(.light)
         
         CustomBtnView_PreviewContainer()
-            .previewDisplayName("Dark Mode")
+            .previewDisplayName("Btn Dark Mode")
             .preferredColorScheme(.dark)
     }
 }

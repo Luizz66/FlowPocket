@@ -10,73 +10,65 @@ import FirebaseAuth
 
 @MainActor
 class LoginViewModel: ObservableObject {
-    @Published var isLoggedIn: Bool = false
-    
-    @Published var sucessMessage: String = ""
     @Published var errorMessage: String = ""
     
     @Published var sucess: Bool = false
     @Published var hasError: Bool = false
     
-    @Published var fieldEmpty: Bool?
-    
     private let service: AuthenticationService
-    private var authHandle: AuthStateDidChangeListenerHandle?
+    
+    //Inputs
+    @Published var emailTxt: String = ""
+    @Published var passwordTxt: String = ""
+    
+    @Published var emailState: InputState = .neutral
+    @Published var passwordState: InputState = .neutral
     
     init(service: AuthenticationService) {
         self.service = service
-        
-        authHandle = Auth.auth().addStateDidChangeListener { _, user in
-            self.isLoggedIn = user != nil
-            
-            if let user = user {
-                print("✅ Usuário logado: \(user.uid)")
-            } else {
-                print("❌ Usuário deslogado")
-            }
-        }
     }
     
-    deinit {
-        if let handle = authHandle {
-            Auth.auth().removeStateDidChangeListener(handle)
-        }
-    }
-    
-    func login(email: String, password: String) {
+    func login() {
         Task {
-            self.hasError = false
-            self.sucess = false
-            
-            if !validateEmail(email) && !validadePassword(password) {
-                self.hasError = true
-                self.errorMessage = "E-mail e senha inválidos!"
-                return
-            }
-            
-            guard validateEmail(email) else {
-                self.hasError = true
-                self.errorMessage = "Favor inserir um e-mail válido!"
-                return
-            }
-            
-            guard validadePassword(password) else {
-                self.hasError = true
-                self.errorMessage = "A senha precisa ter pelo menos 6 caracteres!"
-                return
-            }
-            
             do {
-                let result = try await service.login(email: email, password: password)
+                let result = try await service.login(email: emailTxt, password: passwordTxt)
                 
-                self.sucessMessage = "Logado: \(result.user.uid)"
-                print("✅ Logado: \(result.user.uid)")
                 self.sucess = true
+                
+                print("✅ Logado: \(result.user.uid)")
             } catch {
-                self.hasError = true
-                self.errorMessage = "Erro ao logar, verifique os dados e tente novamente!"
-                print("❌ Erro: \(error)")
+                if validateAll() == true {
+                    self.hasError = true
+                    self.errorMessage = """
+                    Ops, algo deu errado ao logar :(
+                    Confira as informações e tente novamente!
+                    """
+                }
+                print("❌Erro ao logar: \(error), Descrição: \(error.localizedDescription)")
             }
         }
+    }
+    
+    // MARK: - Validations
+    func validateAll() -> Bool {
+        var validate = false
+        
+        if InputValidator.isValid(emailTxt, for: .email) {
+            validate = true
+            emailState = .neutral
+        } else {
+            validate = false
+            emailState = .error(message: "Informe um E-mail válido. Ex: email@dominio.com")
+        }
+        
+        if InputValidator.isValid(passwordTxt, for: .password(min: 6)) {
+            validate = true
+            passwordState = .neutral
+        } else {
+            validate = false
+            passwordState = .error(message: "A senha deve ter no minímo 6 caracteres")
+        }
+        
+        return validate
     }
 }

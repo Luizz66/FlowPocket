@@ -8,47 +8,37 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var emailTxt: String = ""
-    @State private var passwordTxt: String = ""
-    
-    @State private var passWordState: InputState = .neutral
-    @State private var emailState: InputState = .neutral
-    
-    @State private var isValid: Bool = false
-    
     @StateObject private var vm = LoginViewModel(service: AuthenticationService())
     
     @State private var goRegister: Bool = false
+    @State private var goResetPassword: Bool = false
     
     var body: some View {
-        if vm.isLoggedIn {
-            ContentTabView()
-        } else {
-            NavigationStack {
+        NavigationStack {
+            VStack {
+                IconView()
                 VStack {
-                    IconView()
-                    VStack {
-                        LoginTitleView()
-                        VStack(spacing: 20) {
-                            InputsLoginView()
-                            BtnLoginView()
-                            BtnRegisterView()
-                        }
-                        .font(.myFont(style: .body, weight: .medium))
-                        .padding(20)
+                    LoginTitleView()
+                    VStack(spacing: 20) {
+                        InputsLoginView()
+                        BtnsStack()
+                        BtnRegisterView()
                     }
-                    .background(Color.bg)
-                    .customClipShapeRounded()
+                    .font(.myFont(style: .body, weight: .medium))
+                    .padding(20)
                 }
-                .background(Color.mainBlue)
-                .ignoresSafeArea()
+                .padding(.bottom, 25)
+                .background(Color.bg)
+                .customClipShapeRounded()
             }
+            .background(Color.mainBlue)
+            .ignoresSafeArea()
         }
     }
     
     // MARK: - ViewBuilders
     @ViewBuilder
-    func IconView() -> some View {
+    private func IconView() -> some View {
         GeometryReader { geo in
             VStack {
                 Image("ImgIcon")
@@ -65,7 +55,7 @@ struct LoginView: View {
                             )
                         )
                     )
-                    .padding(28)
+                    .padding(20)
                     .background(
                         UnevenRoundedRectangle(
                             cornerRadii: .init(
@@ -77,59 +67,60 @@ struct LoginView: View {
                         )
                         .fill(Color.backdrop)
                     )
-                    .padding(.top, 32)
+                    .padding(.top)
             }
             .frame(width: geo.size.width, height: geo.size.height)
         }
     }
     
     @ViewBuilder
-    func LoginTitleView() -> some View {
+    private func LoginTitleView() -> some View {
         Spacer()
         Text("Login")
             .font(.myFont(style: .largeTitle, weight: .regular))
-            .padding(.vertical, 35)
+            .padding(.vertical)
             .padding(.top)
     }
     
     @ViewBuilder
-    func InputsLoginView() -> some View {
-        Group {
-            VStack(alignment: .leading) {
-                CustomTextField(
-                    text: $emailTxt,
-                    placeholder: "E-mail",
-                    kind: .email,
-                    state: emailState
-                )
-            }
-            
-            VStack(alignment: .leading) {
-                CustomTextField(
-                    text: $passwordTxt,
-                    placeholder: "Senha",
-                    kind: .password(min: 6),
-                    state: passWordState
-                )
-            }
+    private func InputsLoginView() -> some View {
+        VStack(alignment: .leading) {
+            CustomTextField(
+                text: $vm.emailTxt,
+                placeholder: "E-mail",
+                kind: .email,
+                state: vm.emailState
+            )
+        }
+        
+        VStack(alignment: .leading) {
+            CustomTextField(
+                text: $vm.passwordTxt,
+                placeholder: "Senha",
+                kind: .password(min: 6),
+                state: vm.passwordState
+            )
         }
     }
     
     @ViewBuilder
-    func BtnLoginView() -> some View {
-        CustomBtn(txt: "Login", colorTxt: .backdrop, colorBtn: .mainBlue) {
-            if emailTxt != "" && passwordTxt != "" {
-                vm.login(email: emailTxt, password: passwordTxt)
-                if vm.sucess == true {
-                    print("✅Login bem sucedido \(vm.sucessMessage)")
-                }
-            } else {
-                vm.fieldEmpty = true
+    private func BtnsStack() -> some View {
+        VStack(spacing: 0) {
+            BtnLoginView()
+            BtnForgotPassword()
+        }
+    }
+    
+    @ViewBuilder
+    private func BtnLoginView() -> some View {
+        CustomBtn(txt: "Login", colorBtn: .mainBlue) {
+            if vm.validateAll() {
+                vm.login()
             }
         }
-        .padding(.vertical, 20)
-        .padding(.bottom, 5)
-        .alert("Erro", isPresented: $vm.hasError) {
+        .padding(.top, 20)
+        .padding(.bottom, 10)
+        .alert("Erro ao logar!", isPresented: $vm.hasError) {
             Button("OK", role: .cancel) { }
         } message: {
             Text(vm.errorMessage)
@@ -137,18 +128,40 @@ struct LoginView: View {
     }
     
     @ViewBuilder
-    func BtnRegisterView() -> some View {
+    private func BtnForgotPassword() -> some View {
+        CustomBtn(
+            txt: "Esqueci minha senha",
+            colorBtn: .secondary.opacity(0.4),
+            tipTop: false
+        ) { goResetPassword = true }
+        .padding(.bottom, 24)
+        .navigationDestination(isPresented: $goResetPassword) {
+            //
+        }
+    }
+    
+    @ViewBuilder
+    private func BtnRegisterView() -> some View {
         Button("Não Possui Conta? Inscreva-se") {
             goRegister = true
         }
-        .foregroundColor(.black)
-        .padding(.bottom, 40)
+        .foregroundColor(.textPrimary)
+        .padding(.bottom, 30)
         .navigationDestination(isPresented: $goRegister) {
             RegisterView()
         }
     }
 }
 
-#Preview {
-    LoginView()
+// MARK: - Preview
+struct LoginView_Previews: PreviewProvider {
+    static var previews: some View {
+        LoginView()
+            .previewDisplayName("Login Light Mode")
+            .preferredColorScheme(.light)
+        
+        LoginView()
+            .previewDisplayName("Login Dark Mode")
+            .preferredColorScheme(.dark)
+    }
 }
