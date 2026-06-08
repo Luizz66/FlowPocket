@@ -76,7 +76,7 @@ struct CustomTextField: View {
     }
 }
 
-// MARK: - Previews
+// MARK: - Preview
 struct CustomTextField_AllPreviews: PreviewProvider {
     struct DemoView: View {
         @State private var email: String = ""

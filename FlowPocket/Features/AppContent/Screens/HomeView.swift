@@ -31,6 +31,7 @@ struct HomeView: View {
                         .font(.myFont(size: 20))
                     } label: {
                         Text(trans.date!, formatter: itemFormatter)
+                            .font(.myFont(style: .body, weight: .regular))
                     }
                 }
                 .onDelete(perform: deleteItems)
@@ -48,7 +49,8 @@ struct HomeView: View {
             Text("Select an item")
         }
     }
-
+    
+    // MARK: - Funcs
     private func addItem() {
         withAnimation {
             let newItem = Transaction(context: viewContext)
@@ -88,6 +90,8 @@ private let itemFormatter: DateFormatter = {
     return formatter
 }()
 
+
+// MARK: - Preview
 struct HomeView_Preview: PreviewProvider {
     static let previewContext = CoreDataManager.shared.container.viewContext
     

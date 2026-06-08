@@ -131,9 +131,12 @@ struct LoginView: View {
     private func BtnForgotPassword() -> some View {
         CustomBtn(
             txt: "Esqueci minha senha",
-            colorBtn: .secondary.opacity(0.4),
+            colorTxt: .textPrimary,
+            colorBtn: .customGray,
             tipTop: false
-        ) { goResetPassword = true }
+        ) {
+            goResetPassword = true
+        }
         .padding(.bottom, 24)
         .navigationDestination(isPresented: $goResetPassword) {
             //
