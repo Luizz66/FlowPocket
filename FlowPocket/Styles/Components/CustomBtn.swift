@@ -23,11 +23,11 @@ struct CustomBtn: View {
                 .foregroundColor(colorTxt)
                 .shadow(color: .black.opacity(0.2), radius: 2, x: 1, y: 1.5)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, 14)
         }
         .buttonStyle(CustomPressStyle(colorBtn: colorBtn, tipTop: tipTop))
         .shadow(color: .black.opacity(0.6), radius: 2, x: 1.5, y: 1.8)
-        .padding(.vertical, 5)
+        .padding(.vertical, 6)
     }
 }
 
@@ -43,10 +43,10 @@ private struct CustomPressStyle: ButtonStyle {
             .clipShape(
                 UnevenRoundedRectangle(
                     cornerRadii: .init(
-                        topLeading: 24,
-                        bottomLeading: tipTop == false ? 0 : 24,
-                        bottomTrailing: 24,
-                        topTrailing: tipTop == false ? 24 : 0
+                        topLeading: 20,
+                        bottomLeading: tipTop == false ? 0 : 20,
+                        bottomTrailing: 20,
+                        topTrailing: tipTop == false ? 20 : 0
                     )
                 )
             )
@@ -62,14 +62,14 @@ private struct CustomBtnView_PreviewContainer: View {
         VStack {
             CustomBtn(
                 txt: "Login",
-                colorTxt: .black,
+                colorTxt: .white,
                 colorBtn: .mainBlue
             ) { print("login") }
             
             //style tipBottom
             CustomBtn(
                 txt: "Deletar",
-                colorTxt: .purple,
+                colorTxt: .black,
                 colorBtn: .orange,
                 tipTop: false
             ) { }

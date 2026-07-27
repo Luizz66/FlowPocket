@@ -25,7 +25,7 @@ struct ConfigurationView: View {
                     service.logout()
                 }
             } message: {
-                Text("Você precisará fazer login novamente para acessar o app.")
+                Text("Você precisará fazer login quando acessar o app novamente.")
             }
             .padding()
         }

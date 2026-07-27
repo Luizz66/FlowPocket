@@ -88,13 +88,13 @@ struct RegisterView: View {
         .padding(.vertical, 20)
         .padding(.bottom, 5)
         
-        //Alerts
-        .alert("Erro ao criar conta!", isPresented: $vm.hasError) {
+        //alerts
+        .alert("Erro ao criar conta!", isPresented: $vm.registerError) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text(vm.errorMessage)
+            Text(vm.resetErrorMessage)
         }
-        .alert("Conta criada com sucesso!", isPresented: $vm.sucess) {
+        .alert("Conta criada com sucesso!", isPresented: $vm.registerSuccess) {
             Button("Ir para o App") {
                 session.isWaitingRegisterConfirmation = false
                 session.isLoggedIn = true

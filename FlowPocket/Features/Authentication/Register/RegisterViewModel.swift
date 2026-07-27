@@ -11,14 +11,13 @@ import SwiftUI
 
 @MainActor
 class RegisterViewModel: ObservableObject {
-    @Published var errorMessage: String = ""
+    @Published var resetErrorMessage: String = ""
     
-    @Published var sucess: Bool = false
-    @Published var hasError: Bool = false
+    @Published var registerSuccess: Bool = false
+    @Published var registerError: Bool = false
     
     private let service: AuthenticationService
     
-    //Inputs
     @Published var emailTxt: String = ""
     @Published var passwordTxt: String = ""
     @Published var confirmPasswordTxt: String = ""
@@ -36,16 +35,30 @@ class RegisterViewModel: ObservableObject {
             do {
                 let result = try await service.register(email: emailTxt, password: passwordTxt)
                 
-                self.sucess = true
+                self.registerSuccess = true
                 
                 print("✅ Usário criado com sucesso, ID: \(result.user.uid)")
             } catch {
-                if validateAll() {
-                    self.hasError = true
-                    self.errorMessage = """
-                    Ops, algo deu errado ao criar o usuário :(
+                let nsError = error as NSError
+                let authErrorCode = AuthErrorCode(rawValue: nsError.code)
+                let msg = """
+                    Ops, algo deu errado ao criar o usuário.
+                    
                     Confira as informações e tente novamente!
                     """
+                
+                switch authErrorCode {
+                case .networkError:
+                    resetErrorMessage = "Sem conexão com a internet."
+                    registerError = true
+                default:
+                    resetErrorMessage = msg
+                    registerError = true
+                }
+                
+                if validateAll() == true {
+                    self.registerError = true
+                    self.resetErrorMessage = msg
                 }
                 
                 print("❌Erro ao criar conta: \(error), Descrição: \(error.localizedDescription)")
@@ -54,6 +67,8 @@ class RegisterViewModel: ObservableObject {
     }
     
     // MARK: - Validations
+    private let passwordMessage = "A senha deve ter no minímo 6 caracteres"
+    
     func validateAll() -> Bool {
         var validate = false
         
@@ -70,7 +85,7 @@ class RegisterViewModel: ObservableObject {
             passwordState = .neutral
         } else {
             validate = false
-            passwordState = .error(message: "A senha deve ter no minímo 6 caracteres")
+            passwordState = .error(message: passwordMessage)
         }
         
         if passwordTxt == confirmPasswordTxt {
@@ -79,7 +94,7 @@ class RegisterViewModel: ObservableObject {
                 confirmPasswordState = .neutral
             } else {
                 validate = false
-                confirmPasswordState = .error(message: "A senha precisa ter no minímo 6 caracteres")
+                confirmPasswordState = .error(message: passwordMessage)
             }
         } else {
             validate = false

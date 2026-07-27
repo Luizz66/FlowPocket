@@ -10,19 +10,24 @@ import FirebaseAuth
 
 @MainActor
 class LoginViewModel: ObservableObject {
-    @Published var errorMessage: String = ""
+    @Published var loginErrorMessage: String = ""
+    @Published var resetMessage: String = ""
     
-    @Published var sucess: Bool = false
-    @Published var hasError: Bool = false
+    @Published var loginSuccess: Bool = false
+    @Published var loginError: Bool = false
+
+    @Published var resetSuccess: Bool = false
+    @Published var resetShowAlert: Bool = false
     
     private let service: AuthenticationService
     
-    //Inputs
     @Published var emailTxt: String = ""
     @Published var passwordTxt: String = ""
+    @Published var resetEmailTxt: String = ""
     
     @Published var emailState: InputState = .neutral
     @Published var passwordState: InputState = .neutral
+    @Published var resetEmailState: InputState = .neutral
     
     init(service: AuthenticationService) {
         self.service = service
@@ -33,23 +38,79 @@ class LoginViewModel: ObservableObject {
             do {
                 let result = try await service.login(email: emailTxt, password: passwordTxt)
                 
-                self.sucess = true
+                self.loginSuccess = true
                 
                 print("✅ Logado: \(result.user.uid)")
             } catch {
-                if validateAll() == true {
-                    self.hasError = true
-                    self.errorMessage = """
-                    Ops, algo deu errado ao logar :(
+                let nsError = error as NSError
+                let authErrorCode = AuthErrorCode(rawValue: nsError.code)
+                let msg = """
+                    Ops, algo deu errado ao logar.
+                    
                     Confira as informações e tente novamente!
                     """
+                
+                switch authErrorCode {
+                case .networkError:
+                    loginErrorMessage = "Sem conexão com a internet."
+                    loginError = true
+                case .invalidCredential:
+                    loginErrorMessage = "E-mail ou senha incorretos."
+                    loginError = true
+                default:
+                    loginErrorMessage = msg
+                    loginError = true
+                }
+                
+                if validateAll() == true {
+                    self.loginError = true
+                    self.loginErrorMessage = msg
                 }
                 print("❌Erro ao logar: \(error), Descrição: \(error.localizedDescription)")
             }
         }
     }
     
+    func resetPassword() {
+        Task {
+            do {
+                try await service.resetPassword(email: resetEmailTxt)
+                
+                self.resetMessage = """
+                E-mail enviado
+                
+                Se existir uma conta associada a este endereço,
+                você receberá instruções para redefinir sua senha.
+                """
+                self.resetSuccess = true
+            } catch {
+                self.resetSuccess = false
+                if validateResetEmail() == true {
+                    self.resetMessage = """
+                    Algo deu errado!!
+                    
+                    Não foi possível enviar o e-mail de redefinição.
+                    """
+                }
+                print("❌Erro ao resetar senha: \(error), Descrição: \(error.localizedDescription)")
+            }
+            resetShowAlert = true
+        }
+    }
+    
     // MARK: - Validations
+    private let emailMessage = "Informe um E-mail válido. Ex: email@dominio.com"
+    
+    func validateResetEmail() -> Bool {
+        if InputValidator.isValid(resetEmailTxt, for: .email) {
+            resetEmailState = .neutral
+            return true
+        } else {
+            resetEmailState = .error(message: emailMessage)
+            return false
+        }
+    }
+    
     func validateAll() -> Bool {
         var validate = false
         
@@ -58,7 +119,7 @@ class LoginViewModel: ObservableObject {
             emailState = .neutral
         } else {
             validate = false
-            emailState = .error(message: "Informe um E-mail válido. Ex: email@dominio.com")
+            emailState = .error(message: emailMessage)
         }
         
         if InputValidator.isValid(passwordTxt, for: .password(min: 6)) {
@@ -70,5 +131,12 @@ class LoginViewModel: ObservableObject {
         }
         
         return validate
+    }
+    
+    // MARK: - Helpers
+    func clearStates() {
+        emailState = .neutral
+        passwordState = .neutral
+        resetEmailState = .neutral
     }
 }

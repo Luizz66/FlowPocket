@@ -9,7 +9,7 @@ import Foundation
 import FirebaseAuth
 import Combine
 
-//Observa o Firebase
+///Observa o Firebase
 @MainActor
 class SessionViewModel: ObservableObject {
     @Published var isLoggedIn = false

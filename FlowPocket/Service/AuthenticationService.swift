@@ -17,6 +17,10 @@ class AuthenticationService {
         return try await Auth.auth().createUser(withEmail: email, password: password)
     }
     
+    func resetPassword(email: String) async throws {
+        try await Auth.auth().sendPasswordReset(withEmail: email)
+    }
+    
     func logout() {
         try? Auth.auth().signOut()
     }

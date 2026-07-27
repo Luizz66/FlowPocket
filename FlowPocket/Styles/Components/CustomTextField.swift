@@ -15,6 +15,7 @@ struct CustomTextField: View {
     var inputDisable: Bool? = false
     
     @FocusState private var isFocused: Bool
+    @State private var isPasswordVisible: Bool = false
     
     var isFloating: Bool {
         isFocused || !text.isEmpty
@@ -31,9 +32,15 @@ struct CustomTextField: View {
                 txtPlaceHolder()
             }
             
-            txtField()
-                .modifier(BaseCustomTextField(kind: kind))
-                .modifier(InputMaskModifier(kind: kind, text: $text))
+            HStack {
+                txtField()
+                    .modifier(BaseCustomTextField(kind: kind))
+                    .modifier(InputMaskModifier(kind: kind, text: $text))
+                
+                if case .password = kind {
+                    eyeButton()
+                }
+            }
         }
         .padding(8)
         .background(inputFillColor)
@@ -64,7 +71,12 @@ struct CustomTextField: View {
     private func txtField() -> some View {
         Group {
             if case .password = kind {
-                SecureField("", text: $text)
+                if isPasswordVisible {
+                    TextField("", text: $text)
+                        .foregroundColor(inputDisable == true ? inputTextColorSecondary : inputTextColorPrimary)
+                } else {
+                    SecureField("", text: $text)
+                }
             } else {
                 TextField("", text: $text)
                     .foregroundColor(inputDisable == true ? inputTextColorSecondary : inputTextColorPrimary)
@@ -73,6 +85,17 @@ struct CustomTextField: View {
         .focused($isFocused)
         .padding(.top, placeholder != "" ? 6 : 0)
         .frame(height: 39)
+    }
+    
+    @ViewBuilder
+    private func eyeButton() -> some View {
+        Button {
+            isPasswordVisible.toggle()
+        } label: {
+            Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
+                .foregroundColor(inputTextColorSecondary)
+        }
+        .padding(.top, placeholder != "" ? 6 : 0)
     }
 }
 

@@ -33,6 +33,9 @@ struct LoginView: View {
             }
             .background(Color.mainBlue)
             .ignoresSafeArea()
+            .onAppear {
+                vm.clearStates()
+            }
         }
     }
     
@@ -120,10 +123,10 @@ struct LoginView: View {
         }
         .padding(.top, 20)
         .padding(.bottom, 10)
-        .alert("Erro ao logar!", isPresented: $vm.hasError) {
+        .alert("Erro ao logar!", isPresented: $vm.loginError) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text(vm.errorMessage)
+            Text(vm.loginErrorMessage)
         }
     }
     
@@ -136,10 +139,13 @@ struct LoginView: View {
             tipTop: false
         ) {
             goResetPassword = true
+            vm.clearStates()
         }
         .padding(.bottom, 24)
-        .navigationDestination(isPresented: $goResetPassword) {
-            //
+        .sheet(isPresented: $goResetPassword) {
+            VStack {
+                ResetPasswordSheetView(vm: vm, isPresented: $goResetPassword)
+            }
         }
     }
     

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-//Controle de Autenticação
+///Controle de Autenticação
 struct RootView: View {
     @StateObject private var session = SessionViewModel()
     
