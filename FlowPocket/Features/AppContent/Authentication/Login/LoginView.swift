@@ -21,6 +21,7 @@ struct LoginView: View {
                     LoginTitleView()
                     VStack(spacing: 20) {
                         InputsLoginView()
+                        Spacer()
                         BtnsStack()
                         BtnRegisterView()
                     }
@@ -54,7 +55,7 @@ struct LoginView: View {
                                 topLeading: 25,
                                 bottomLeading: 25,
                                 bottomTrailing: 25,
-                                topTrailing: 0
+                                topTrailing: 3
                             )
                         )
                     )
@@ -65,7 +66,7 @@ struct LoginView: View {
                                 topLeading: 35,
                                 bottomLeading: 35,
                                 bottomTrailing: 35,
-                                topTrailing: 0
+                                topTrailing: 3
                             )
                         )
                         .fill(Color.backdrop)
@@ -116,7 +117,10 @@ struct LoginView: View {
     
     @ViewBuilder
     private func BtnLoginView() -> some View {
-        CustomBtn(txt: "Login", colorBtn: .mainBlue) {
+        CustomBtn(
+            txt: "Login",
+            colorBtn: .mainBlue
+        ) {
             if vm.validateAll() {
                 vm.login()
             }
@@ -155,6 +159,7 @@ struct LoginView: View {
             goRegister = true
         }
         .foregroundColor(.textPrimary)
+        .underline()
         .padding(.bottom, 30)
         .navigationDestination(isPresented: $goRegister) {
             RegisterView()

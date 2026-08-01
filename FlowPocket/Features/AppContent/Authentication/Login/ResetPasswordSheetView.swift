@@ -46,7 +46,7 @@ struct ResetPasswordSheetView: View {
             }
             
             CustomBtn(
-                txt: "Voltar",
+                txt: "Cancelar",
                 colorTxt: .textPrimary,
                 colorBtn: .customGray,
                 tipTop: false

@@ -23,11 +23,11 @@ struct CustomBtn: View {
                 .foregroundColor(colorTxt)
                 .shadow(color: .black.opacity(0.2), radius: 2, x: 1, y: 1.5)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, 15)
         }
         .buttonStyle(CustomPressStyle(colorBtn: colorBtn, tipTop: tipTop))
         .shadow(color: .black.opacity(0.6), radius: 2, x: 1.5, y: 1.8)
-        .padding(.vertical, 6)
+        .padding(.vertical, 3)
     }
 }
 
@@ -43,10 +43,10 @@ private struct CustomPressStyle: ButtonStyle {
             .clipShape(
                 UnevenRoundedRectangle(
                     cornerRadii: .init(
-                        topLeading: 20,
-                        bottomLeading: tipTop == false ? 0 : 20,
-                        bottomTrailing: 20,
-                        topTrailing: tipTop == false ? 20 : 0
+                        topLeading: 29,
+                        bottomLeading: tipTop == false ? 2 : 29,
+                        bottomTrailing: 29,
+                        topTrailing: tipTop == false ? 29 : 2
                     )
                 )
             )

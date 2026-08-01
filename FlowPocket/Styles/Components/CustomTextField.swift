@@ -95,7 +95,6 @@ struct CustomTextField: View {
             Image(systemName: isPasswordVisible ? "eye.fill" : "eye.slash.fill")
                 .foregroundColor(inputTextColorSecondary)
         }
-        .padding(.top, placeholder != "" ? 6 : 0)
     }
 }
 
@@ -142,16 +141,14 @@ struct CustomTextField_AllPreviews: PreviewProvider {
                     VStack(alignment: .leading, spacing: 4) {
                         CustomTextField(text: $cpf, placeholder: "CPF", kind: .freeText, inputDisable: true)
                     }
+                    .padding(.bottom, 32)
+                    CustomBtn(
+                        txt: "Salvar",
+                        colorBtn: .mainBlue
+                    ) { validate() }
                 }
-                .padding(.bottom, 32)
-                
-                CustomBtn(
-                    txt: "Salvar",
-                    colorBtn: .mainBlue
-                ) { validate() }
-                
+                .padding()
             }
-            .padding()
         }
         
         // MARK: - validação exemplo
