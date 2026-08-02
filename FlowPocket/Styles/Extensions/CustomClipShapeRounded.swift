@@ -12,7 +12,7 @@ extension View {
         self.clipShape(
         UnevenRoundedRectangle(
                 cornerRadii: .init(
-                    topLeading: 100,
+                    topLeading: 90,
                     bottomLeading: 0,
                     bottomTrailing: 0,
                     topTrailing: 0
@@ -49,4 +49,3 @@ private struct CustomClipShapeRoundedView_PreviewContainer: View {
     CustomClipShapeRoundedView_PreviewContainer()
         .preferredColorScheme(.dark)
 }
-

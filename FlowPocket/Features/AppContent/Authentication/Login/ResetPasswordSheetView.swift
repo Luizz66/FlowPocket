@@ -37,13 +37,6 @@ struct ResetPasswordSheetView: View {
                     vm.resetPassword()
                 }
             }
-            .alert(vm.resetMessage, isPresented: $vm.resetShowAlert) {
-                Button("OK", role: .cancel) {
-                    if vm.resetSuccess == true {
-                        isPresented = false
-                    }
-                }
-            }
             
             CustomBtn(
                 txt: "Cancelar",
@@ -57,10 +50,19 @@ struct ResetPasswordSheetView: View {
         .onDisappear {
             vm.resetEmailState = .neutral
             vm.resetEmailTxt = ""
+            vm.resetSuccess = false
         }
         .padding(20)
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+        .loadingOverlay(isLoading: vm.isLoadingReset, message: "Enviando...")
+        .alert(vm.resetMessage, isPresented: $vm.resetShowAlert) {
+            Button("OK", role: .cancel) {
+                if vm.resetSuccess == true {
+                    isPresented = false
+                }
+            }
+        }
     }
 }
 

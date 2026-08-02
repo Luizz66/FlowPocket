@@ -34,6 +34,20 @@ struct RegisterView: View {
             .background(Color.mainBlue)
             .ignoresSafeArea()
         }
+        .loadingOverlay(isLoading: vm.isLoading, message: "Criando conta...")
+        .alert("Erro ao criar conta!", isPresented: $vm.registerError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(vm.resetErrorMessage)
+        }
+        .alert("Conta criada com sucesso!", isPresented: $vm.registerSuccess) {
+            Button("Ir para o App") {
+                session.isWaitingRegisterConfirmation = false
+                session.isLoggedIn = true
+            }
+        } message: {
+            Text("E-mail: \(vm.userEmail)")
+        }
     }
     
     // MARK: - ViewBuilders
@@ -87,27 +101,13 @@ struct RegisterView: View {
         }
         .padding(.vertical, 20)
         .padding(.bottom, 5)
-        
-        //alerts
-        .alert("Erro ao criar conta!", isPresented: $vm.registerError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(vm.resetErrorMessage)
-        }
-        .alert("Conta criada com sucesso!", isPresented: $vm.registerSuccess) {
-            Button("Ir para o App") {
-                session.isWaitingRegisterConfirmation = false
-                session.isLoggedIn = true
-            }
-        }
     }
     
     @ViewBuilder
     func BtnHasAccountView() -> some View {
-        Button("Já possui conta? Entre") {
+        TextBtn(txt: "Já possui conta? Entre") {
             dismiss()
         }
-        .foregroundColor(.textPrimary)
         .padding(.bottom, 60)
     }
 }

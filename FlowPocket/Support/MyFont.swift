@@ -36,7 +36,7 @@ extension Font {
         return .custom(fontName, size: size)
     }
     
-    //pega o valor base para retornar o style correto
+    ///pega o valor base para retornar o style correto
     private static func baseSize(for style: Font.TextStyle) -> CGFloat {
         switch style {
         case .largeTitle: return 34

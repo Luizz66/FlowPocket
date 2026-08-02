@@ -12,30 +12,34 @@ struct ContentTabView: View {
     
     var body: some View {
         TabView {
-            HomeView()
-                .tabItem {
-                    Image(systemName: "house")
-                }
-            
-            TransactionView()
-                .tabItem {
-                    Image(systemName: "arrow.left.arrow.right")
-                }
-            
-            AddNewTransactionView()
-                .tabItem {
-                    Image(systemName: "plus.app.fill")
-                }
-            
-            ChartsView()
-                .tabItem {
-                    Image(systemName: "chart.bar.fill")
-                }
-            
-            ConfigurationView()
-                .tabItem {
-                    Image(systemName: "gearshape.fill")
-                }
+            Group {
+                HomeView()
+                    .tabItem {
+                        Image(systemName: "house")
+                    }
+                
+                TransactionView()
+                    .tabItem {
+                        Image(systemName: "arrow.left.arrow.right")
+                    }
+                
+                AddNewTransactionView()
+                    .tabItem {
+                        Image(systemName: "plus.app.fill")
+                    }
+                
+                ChartsView()
+                    .tabItem {
+                        Image(systemName: "chart.bar.fill")
+                    }
+                
+                ConfigurationView()
+                    .tabItem {
+                        Image(systemName: "gearshape.fill")
+                    }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.bg)
         }
     }
 }
@@ -44,9 +48,9 @@ struct ContentTabView_Preview: PreviewProvider {
     static let previewContext = CoreDataManager.shared.container.viewContext
     
     static var previews: some View {
-        NavigationView { 
+        NavigationView {
             ContentTabView()
-                .environment(\.managedObjectContext, previewContext)            
+                .environment(\.managedObjectContext, previewContext)
         }
     }
 }

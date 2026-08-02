@@ -15,9 +15,12 @@ class LoginViewModel: ObservableObject {
     
     @Published var loginSuccess: Bool = false
     @Published var loginError: Bool = false
-
+    
     @Published var resetSuccess: Bool = false
     @Published var resetShowAlert: Bool = false
+    
+    @Published var isLoadingLogin: Bool = false
+    @Published var isLoadingReset: Bool = false
     
     private let service: AuthenticationService
     
@@ -35,6 +38,8 @@ class LoginViewModel: ObservableObject {
     
     func login() {
         Task {
+            isLoadingLogin = true
+            
             do {
                 let result = try await service.login(email: emailTxt, password: passwordTxt)
                 
@@ -53,26 +58,27 @@ class LoginViewModel: ObservableObject {
                 switch authErrorCode {
                 case .networkError:
                     loginErrorMessage = "Sem conexão com a internet."
-                    loginError = true
                 case .invalidCredential:
                     loginErrorMessage = "E-mail ou senha incorretos."
-                    loginError = true
                 default:
                     loginErrorMessage = msg
-                    loginError = true
                 }
                 
-                if validateAll() == true {
-                    self.loginError = true
-                    self.loginErrorMessage = msg
-                }
-                print("❌Erro ao logar: \(error), Descrição: \(error.localizedDescription)")
+                isLoadingLogin = false
+                loginError = true
+                
+                print("❌ Erro ao logar: \(error), Descrição: \(error.localizedDescription)")
+                return
             }
+            
+            isLoadingLogin = false
         }
     }
     
     func resetPassword() {
         Task {
+            isLoadingReset = true
+            
             do {
                 try await service.resetPassword(email: resetEmailTxt)
                 
@@ -92,8 +98,10 @@ class LoginViewModel: ObservableObject {
                     Não foi possível enviar o e-mail de redefinição.
                     """
                 }
-                print("❌Erro ao resetar senha: \(error), Descrição: \(error.localizedDescription)")
+                print("❌ Erro ao resetar senha: \(error), Descrição: \(error.localizedDescription)")
             }
+            
+            isLoadingReset = false
             resetShowAlert = true
         }
     }

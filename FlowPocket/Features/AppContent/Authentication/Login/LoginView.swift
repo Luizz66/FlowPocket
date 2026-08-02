@@ -38,6 +38,12 @@ struct LoginView: View {
                 vm.clearStates()
             }
         }
+        .loadingOverlay(isLoading: vm.isLoadingLogin, message: "Carregando...")
+        .alert("Erro ao logar!", isPresented: $vm.loginError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(vm.loginErrorMessage)
+        }
     }
     
     // MARK: - ViewBuilders
@@ -48,7 +54,10 @@ struct LoginView: View {
                 Image("ImgIcon")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: geo.size.width / 3.7)
+                    .frame(width: geo.size.width / 3.9)
+                    .overlay {
+                        Color.white.opacity(0.07)
+                    }
                     .clipShape(
                         UnevenRoundedRectangle(
                             cornerRadii: .init(
@@ -71,7 +80,7 @@ struct LoginView: View {
                         )
                         .fill(Color.backdrop)
                     )
-                    .padding(.top)
+                    .padding(.top, 32)
             }
             .frame(width: geo.size.width, height: geo.size.height)
         }
@@ -127,11 +136,6 @@ struct LoginView: View {
         }
         .padding(.top, 20)
         .padding(.bottom, 10)
-        .alert("Erro ao logar!", isPresented: $vm.loginError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(vm.loginErrorMessage)
-        }
     }
     
     @ViewBuilder
@@ -155,11 +159,9 @@ struct LoginView: View {
     
     @ViewBuilder
     private func BtnRegisterView() -> some View {
-        Button("Não Possui Conta? Inscreva-se") {
+        TextBtn(txt: "Não Possui Conta? Inscreva-se") {
             goRegister = true
         }
-        .foregroundColor(.textPrimary)
-        .underline()
         .padding(.bottom, 30)
         .navigationDestination(isPresented: $goRegister) {
             RegisterView()

@@ -13,13 +13,13 @@ struct CustomBtn: View {
     let colorBtn: Color
     var tipTop: Bool?
     let action: () -> Void
-
+    
     var body: some View {
         Button {
             action()
         } label: {
             Text(txt)
-                .font(.myFont(style: .title2, weight: .medium))
+                .font(.myFont(style: .headline, weight: .semiBold))
                 .foregroundColor(colorTxt)
                 .shadow(color: .black.opacity(0.2), radius: 2, x: 1, y: 1.5)
                 .frame(maxWidth: .infinity)
@@ -31,10 +31,11 @@ struct CustomBtn: View {
     }
 }
 
+// MARK: - Helpers
 private struct CustomPressStyle: ButtonStyle {
     let colorBtn: Color
     var tipTop: Bool?
-
+    
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .background(
@@ -66,11 +67,11 @@ private struct CustomBtnView_PreviewContainer: View {
                 colorBtn: .mainBlue
             ) { print("login") }
             
-            //style tipBottom
+            ///style tipBottom
             CustomBtn(
                 txt: "Deletar",
                 colorTxt: .black,
-                colorBtn: .orange,
+                colorBtn: .limon,
                 tipTop: false
             ) { }
         }
@@ -78,14 +79,12 @@ private struct CustomBtnView_PreviewContainer: View {
     }
 }
 
-struct CustomBtnView_Previews: PreviewProvider {
-    static var previews: some View {
-        CustomBtnView_PreviewContainer()
-            .previewDisplayName("Btn Light Mode")
-            .preferredColorScheme(.light)
-        
-        CustomBtnView_PreviewContainer()
-            .previewDisplayName("Btn Dark Mode")
-            .preferredColorScheme(.dark)
-    }
+#Preview("Btn Light Mode") {
+    CustomBtnView_PreviewContainer()
+        .preferredColorScheme(.light)
+}
+
+#Preview("Btn Dark Mode") {
+    CustomBtnView_PreviewContainer()
+        .preferredColorScheme(.dark)
 }

@@ -14,7 +14,7 @@ struct RootView: View {
     var body: some View {
         Group {
             if session.isLoading {
-                ProgressView()
+                LoadingOverlayView()
             } else if session.isLoggedIn {
                 ContentTabView()
             } else {

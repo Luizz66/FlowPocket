@@ -11,7 +11,7 @@ struct ConfigurationView: View {
     private let service = AuthenticationService()
     
     @State private var showLogout: Bool = false
-
+    
     var body: some View {
         VStack {
             Text("Configuration")
@@ -19,15 +19,15 @@ struct ConfigurationView: View {
             Button("Sair") {
                 showLogout = true
             }
-            .alert("Tem certeza que deseja sair da conta?", isPresented: $showLogout) {
-                Button("Cancelar", role: .cancel) { }
-                Button("Sair", role: .destructive) {
-                    service.logout()
-                }
-            } message: {
-                Text("Você precisará fazer login quando acessar o app novamente.")
-            }
             .padding()
+        }
+        .alert("Tem certeza que deseja sair da conta?", isPresented: $showLogout) {
+            Button("Cancelar", role: .cancel) { }
+            Button("Sair", role: .destructive) {
+                service.logout()
+            }
+        } message: {
+            Text("Você precisará fazer login quando acessar o app novamente.")
         }
     }
 }

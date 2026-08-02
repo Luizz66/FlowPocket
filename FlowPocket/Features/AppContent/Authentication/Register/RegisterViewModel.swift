@@ -12,9 +12,12 @@ import SwiftUI
 @MainActor
 class RegisterViewModel: ObservableObject {
     @Published var resetErrorMessage: String = ""
+    @Published var userEmail: String = ""
     
     @Published var registerSuccess: Bool = false
     @Published var registerError: Bool = false
+    
+    @Published var isLoading: Bool = false
     
     private let service: AuthenticationService
     
@@ -32,12 +35,18 @@ class RegisterViewModel: ObservableObject {
     
     func register() {
         Task {
+            isLoading = true
+            
             do {
                 let result = try await service.register(email: emailTxt, password: passwordTxt)
                 
-                self.registerSuccess = true
+                self.userEmail = result.user.email ?? "E-mail não encontrado!!!"
                 
                 print("✅ Usário criado com sucesso, ID: \(result.user.uid)")
+
+                isLoading = false
+                self.registerSuccess = true
+                
             } catch {
                 let nsError = error as NSError
                 let authErrorCode = AuthErrorCode(rawValue: nsError.code)
@@ -50,18 +59,14 @@ class RegisterViewModel: ObservableObject {
                 switch authErrorCode {
                 case .networkError:
                     resetErrorMessage = "Sem conexão com a internet."
-                    registerError = true
                 default:
                     resetErrorMessage = msg
-                    registerError = true
                 }
                 
-                if validateAll() == true {
-                    self.registerError = true
-                    self.resetErrorMessage = msg
-                }
+                isLoading = false
+                registerError = true
                 
-                print("❌Erro ao criar conta: \(error), Descrição: \(error.localizedDescription)")
+                print("❌ Erro ao criar conta: \(error), Descrição: \(error.localizedDescription)")
             }
         }
     }

@@ -10,12 +10,12 @@ import CoreData
 
 struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Transaction.date, ascending: true)],
         animation: .default
     ) private var transactions: FetchedResults<Transaction>
-
+    
     var body: some View {
         NavigationView {
             List {
@@ -59,7 +59,7 @@ struct HomeView: View {
             newItem.type = "Gasto"
             newItem.value = NSDecimalNumber(decimal: Decimal(50.00))
             newItem.category = "Mercado"
-
+            
             do {
                 try viewContext.save()
             } catch {
@@ -68,7 +68,7 @@ struct HomeView: View {
             }
         }
     }
-
+    
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { transactions[$0] }.forEach(viewContext.delete)
@@ -83,6 +83,7 @@ struct HomeView: View {
     }
 }
 
+// MARK: - Helpers
 private let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .short
@@ -96,9 +97,9 @@ struct HomeView_Preview: PreviewProvider {
     static let previewContext = CoreDataManager.shared.container.viewContext
     
     static var previews: some View {
-        NavigationView { 
+        NavigationView {
             HomeView()
-                .environment(\.managedObjectContext, previewContext)            
+                .environment(\.managedObjectContext, previewContext)
         }
     }
 }
