@@ -51,12 +51,14 @@ struct LoginView: View {
     private func IconView() -> some View {
         GeometryReader { geo in
             VStack {
+                Spacer()
+                Spacer()
                 Image("ImgIcon")
                     .resizable()
                     .scaledToFit()
                     .frame(width: geo.size.width / 3.9)
                     .overlay {
-                        Color.white.opacity(0.07)
+                        Color.white.opacity(0.09)
                     }
                     .clipShape(
                         UnevenRoundedRectangle(
@@ -78,9 +80,9 @@ struct LoginView: View {
                                 topTrailing: 3
                             )
                         )
-                        .fill(Color.backdrop)
+                        .fill(Color.bg)
                     )
-                    .padding(.top, 32)
+                Spacer()
             }
             .frame(width: geo.size.width, height: geo.size.height)
         }

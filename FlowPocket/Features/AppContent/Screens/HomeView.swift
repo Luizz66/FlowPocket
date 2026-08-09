@@ -12,85 +12,18 @@ struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Transaction.date, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Transaction.date, ascending: false)],
         animation: .default
     ) private var transactions: FetchedResults<Transaction>
     
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(transactions) { trans in
-                    NavigationLink {
-                        Group {
-                            Text("Adicionado em: \(trans.date!, formatter: itemFormatter)")
-                            Text("Name: \(trans.name!)")
-                            Text("Tipo: \(trans.type!)")
-                            Text("Valor: \(trans.value!)")
-                            Text("Categoria: \(trans.category!)")
-                        }
-                        .font(.myFont(size: 20))
-                    } label: {
-                        Text(trans.date!, formatter: itemFormatter)
-                            .font(.myFont(style: .body, weight: .regular))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            Text("Select an item")
-        }
-    }
-    
-    // MARK: - Funcs
-    private func addItem() {
-        withAnimation {
-            let newItem = Transaction(context: viewContext)
-            newItem.date = Date()
-            newItem.name = "Teste"
-            newItem.type = "Gasto"
-            newItem.value = NSDecimalNumber(decimal: Decimal(50.00))
-            newItem.category = "Mercado"
+        VStack {
+            Text("Home")
             
-            do {
-                try viewContext.save()
-            } catch {
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-    
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { transactions[$0] }.forEach(viewContext.delete)
-            
-            do {
-                try viewContext.save()
-            } catch {
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+            Text("Total de transações: \(transactions.count)")
         }
     }
 }
-
-// MARK: - Helpers
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
 
 // MARK: - Preview
 struct HomeView_Preview: PreviewProvider {

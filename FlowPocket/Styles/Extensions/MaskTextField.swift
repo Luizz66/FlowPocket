@@ -128,8 +128,7 @@ public enum InputValidator {
         switch kind {
             
         case .password(let min):
-            let regex = "^[A-Za-z0-9]{\(min),}$"
-            return text.range(of: regex, options: .regularExpression) != nil
+            return text.count >= min
             
         case .name:
             return text
