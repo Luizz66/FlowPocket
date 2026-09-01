@@ -1,5 +1,5 @@
 //
-//  TransactionView.swift
+//  AddNewTransactionView.swift
 //  FlowPocket
 //
 //  Created by Luiz Gustavo Barros Campos on 30/03/26.
@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-struct TransactionView: View {
+struct AddNewTransactionView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @FetchRequest(
@@ -18,7 +18,7 @@ struct TransactionView: View {
     
     var body: some View {
         VStack {
-            Text("Minhas transações")
+            Text("Add nova transação")
             
             List(transactions.prefix(5)) { trans in
                 Text(trans.name ?? "Sem nome")
@@ -28,12 +28,12 @@ struct TransactionView: View {
 }
 
 // MARK: - Preview
-struct TransactionView_Preview: PreviewProvider {
+struct AddNewTransactionView_Preview: PreviewProvider {
     static let previewContext = CoreDataManager.shared.container.viewContext
     
     static var previews: some View {
         NavigationView {
-            HomeView()
+            AddNewTransactionView()
                 .environment(\.managedObjectContext, previewContext)
         }
     }

@@ -1,16 +1,14 @@
 //
-//  AddNewTransactionView.swift
+//  TransactionsView.swift
 //  FlowPocket
 //
 //  Created by Luiz Gustavo Barros Campos on 30/03/26.
 //
 
 import SwiftUI
-
-import SwiftUI
 import CoreData
 
-struct AddNewTransactionView: View {
+struct TransactionsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @FetchRequest(
@@ -95,14 +93,13 @@ private let itemFormatter: DateFormatter = {
 
 
 // MARK: - Preview
-struct AddNewTransactionView_Preview: PreviewProvider {
+struct TransactionsView_Preview: PreviewProvider {
     static let previewContext = CoreDataManager.shared.container.viewContext
     
     static var previews: some View {
         NavigationView {
-            TransactionView()
+            TransactionsView()
                 .environment(\.managedObjectContext, previewContext)
         }
     }
 }
-
