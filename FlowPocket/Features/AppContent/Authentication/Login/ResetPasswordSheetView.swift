@@ -12,26 +12,58 @@ struct ResetPasswordSheetView: View {
     @Binding var isPresented: Bool
     
     var body: some View {
-        VStack {
-            Text("Recuperação de senha")
-                .font(.myFont(style: .title2, weight: .medium))
-                .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack {
+            VStack {
+                txtcontent()
+                
+                CustomTextField(
+                    text: $vm.resetEmailTxt,
+                    placeholder: "E-mail cadastrado",
+                    kind: .email,
+                    state: vm.resetEmailState
+                )
                 .padding(.vertical)
+                
+                Spacer()
+            }
+            .padding(20)
+            .padding(.bottom, 120)
             
-            Text("Informe seu e-mail de cadastro. Se existir uma conta vinculada a ele, você receberá um link para redefinir sua senha.")
-                .font(.myFont(style: .body, weight: .regular))
-                .padding(.bottom)
-            
-            CustomTextField(
-                text: $vm.resetEmailTxt,
-                placeholder: "E-mail cadastrado",
-                kind: .email,
-                state: vm.resetEmailState
-            )
+            btnsStackView()
+        }
+        .onDisappear {
+            vm.resetEmailState = .neutral
+            vm.resetEmailTxt = ""
+            vm.resetSuccess = false
+        }
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+        .loadingOverlay(isLoading: vm.isLoadingReset, message: "Enviando...")
+        .alert(vm.resetMessage, isPresented: $vm.resetShowAlert) {
+            Button("OK", role: .cancel) {
+                if vm.resetSuccess == true {
+                    isPresented = false
+                }
+            }
+        }
+    }
+    
+    // MARK: - ViewBuilders
+    @ViewBuilder
+    private func txtcontent() -> some View {
+        Text("Recuperação de senha")
+            .font(.myFont(style: .title2, weight: .medium))
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical)
-            
-            Spacer()
-            
+        
+        Text("Informe seu e-mail de cadastro. Se existir uma conta vinculada a ele, você receberá um link para redefinir sua senha.")
+            .font(.myFont(style: .body, weight: .regular))
+            .padding(.bottom)
+    }
+    
+    @ViewBuilder
+    private func btnsStackView() -> some View {
+        VStack(spacing: 10) {
             CustomBtn(txt: "Enviar", colorBtn: .mainBlue) {
                 if vm.validateResetEmail() {
                     vm.resetPassword()
@@ -47,22 +79,10 @@ struct ResetPasswordSheetView: View {
                 isPresented = false
             }
         }
-        .onDisappear {
-            vm.resetEmailState = .neutral
-            vm.resetEmailTxt = ""
-            vm.resetSuccess = false
-        }
-        .padding(20)
-        .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
-        .loadingOverlay(isLoading: vm.isLoadingReset, message: "Enviando...")
-        .alert(vm.resetMessage, isPresented: $vm.resetShowAlert) {
-            Button("OK", role: .cancel) {
-                if vm.resetSuccess == true {
-                    isPresented = false
-                }
-            }
-        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 20)
+        .frame(maxHeight: .infinity, alignment: .bottom)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 }
 

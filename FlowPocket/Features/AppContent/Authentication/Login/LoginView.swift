@@ -15,25 +15,36 @@ struct LoginView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                IconView()
+            ZStack {
+                Color.mainBlue
+                    .ignoresSafeArea()
+                
                 VStack {
-                    LoginTitleView()
-                    VStack(spacing: 20) {
-                        InputsLoginView()
-                        Spacer()
-                        BtnsStack()
-                        BtnRegisterView()
+                    iconView()
+                        .opacity(goResetPassword ? 0 : 1)
+                        .animation(
+                            goResetPassword
+                            ? .easeOut(duration: 0.9)
+                                : nil,
+                            value: goResetPassword
+                        )
+                    VStack {
+                        loginTitleView()
+                        VStack(spacing: 20) {
+                            inputsLoginView()
+                            Spacer()
+                            btnsStackView()
+                            btnRegisterView()
+                        }
+                        .font(.myFont(style: .body, weight: .medium))
+                        .padding(20)
                     }
-                    .font(.myFont(style: .body, weight: .medium))
-                    .padding(20)
+                    .safeAreaPadding(.bottom)
+                    .background(Color.bg)
+                    .customClipShapeRounded()
                 }
-                .padding(.bottom, 25)
-                .background(Color.bg)
-                .customClipShapeRounded()
             }
-            .background(Color.mainBlue)
-            .ignoresSafeArea()
+            .ignoresSafeArea(edges: .bottom)
             .onAppear {
                 vm.clearStates()
             }
@@ -48,48 +59,44 @@ struct LoginView: View {
     
     // MARK: - ViewBuilders
     @ViewBuilder
-    private func IconView() -> some View {
-        GeometryReader { geo in
-            VStack {
-                Spacer()
-                Spacer()
-                Image("ImgIcon")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: geo.size.width / 3.9)
-                    .overlay {
-                        Color.white.opacity(0.09)
-                    }
-                    .clipShape(
-                        UnevenRoundedRectangle(
-                            cornerRadii: .init(
-                                topLeading: 25,
-                                bottomLeading: 25,
-                                bottomTrailing: 25,
-                                topTrailing: 3
-                            )
+    private func iconView() -> some View {
+        let iconWidth = UIScreen.main.bounds.width / 3.9
+        
+        VStack {
+            Image("ImgIcon")
+                .resizable()
+                .scaledToFit()
+                .frame(width: iconWidth)
+                .clipShape(
+                    UnevenRoundedRectangle(
+                        cornerRadii: .init(
+                            topLeading: 25,
+                            bottomLeading: 25,
+                            bottomTrailing: 25,
+                            topTrailing: 3
                         )
                     )
-                    .padding(20)
-                    .background(
-                        UnevenRoundedRectangle(
-                            cornerRadii: .init(
-                                topLeading: 35,
-                                bottomLeading: 35,
-                                bottomTrailing: 35,
-                                topTrailing: 3
-                            )
+                )
+                .padding(20)
+                .background(
+                    UnevenRoundedRectangle(
+                        cornerRadii: .init(
+                            topLeading: 35,
+                            bottomLeading: 35,
+                            bottomTrailing: 35,
+                            topTrailing: 3
                         )
-                        .fill(Color.bg)
                     )
-                Spacer()
-            }
-            .frame(width: geo.size.width, height: geo.size.height)
+                    .fill(Color.bg)
+                )
+                .safeAreaPadding(.top)
+                .padding(.bottom)
         }
+        .padding()
     }
     
     @ViewBuilder
-    private func LoginTitleView() -> some View {
+    private func loginTitleView() -> some View {
         Spacer()
         Text("Login")
             .font(.myFont(style: .largeTitle, weight: .regular))
@@ -98,7 +105,7 @@ struct LoginView: View {
     }
     
     @ViewBuilder
-    private func InputsLoginView() -> some View {
+    private func inputsLoginView() -> some View {
         VStack(alignment: .leading) {
             CustomTextField(
                 text: $vm.emailTxt,
@@ -119,15 +126,15 @@ struct LoginView: View {
     }
     
     @ViewBuilder
-    private func BtnsStack() -> some View {
-        VStack(spacing: 0) {
-            BtnLoginView()
-            BtnForgotPassword()
+    private func btnsStackView() -> some View {
+        VStack(spacing: 10) {
+            btnLoginView()
+            btnForgotPassword()
         }
     }
     
     @ViewBuilder
-    private func BtnLoginView() -> some View {
+    private func btnLoginView() -> some View {
         CustomBtn(
             txt: "Login",
             colorBtn: .mainBlue
@@ -137,11 +144,10 @@ struct LoginView: View {
             }
         }
         .padding(.top, 20)
-        .padding(.bottom, 10)
     }
     
     @ViewBuilder
-    private func BtnForgotPassword() -> some View {
+    private func btnForgotPassword() -> some View {
         CustomBtn(
             txt: "Esqueci minha senha",
             colorTxt: .textPrimary,
@@ -160,7 +166,7 @@ struct LoginView: View {
     }
     
     @ViewBuilder
-    private func BtnRegisterView() -> some View {
+    private func btnRegisterView() -> some View {
         TextBtn(txt: "Não Possui Conta? Inscreva-se") {
             goRegister = true
         }

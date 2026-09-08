@@ -15,23 +15,29 @@ struct RegisterView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                RegisterTitleView()
-                VStack {
-                    VStack(spacing: 20) {
-                        InputsRegisterView()
-                        BtnRegisterView()
-                        BtnHasAccountView()
+            ZStack {
+                Color.mainBlue
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    registerTitleView()
+                    
+                    VStack {
+                        VStack(spacing: 20) {
+                            inputsRegisterView()
+                            btnRegisterView()
+                            btnHasAccountView()
+                        }
+                        .font(.myFont(style: .body, weight: .medium))
+                        .padding(20)
+                        .padding(.top, 65)
                     }
-                    .font(.myFont(style: .body, weight: .medium))
-                    .padding(20)
-                    .padding(.top, 65)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .safeAreaPadding(.bottom)
+                    .background(Color.bg)
+                    .customClipShapeRounded()
                 }
-                .padding(.bottom)
-                .background(Color.bg)
-                .customClipShapeRounded()
             }
-            .background(Color.mainBlue)
             .ignoresSafeArea()
         }
         .loadingOverlay(isLoading: vm.isLoading, message: "Criando conta...")
@@ -52,17 +58,20 @@ struct RegisterView: View {
     
     // MARK: - ViewBuilders
     @ViewBuilder
-    func RegisterTitleView() -> some View {
-        Spacer()
-        Text("Inscreva-se")
-            .font(.myFont(style: .largeTitle, weight: .regular))
-            .padding(.vertical)
-            .foregroundColor(.white)
-        Spacer()
+    func registerTitleView() -> some View {
+        VStack {
+            Text("Inscreva-se")
+                .font(.myFont(style: .largeTitle, weight: .regular))
+                .padding(.vertical)
+                .foregroundColor(.white)
+        }
+        .padding(.top, 100)
+        .padding(.vertical)
+        .safeAreaPadding(.top)
     }
     
     @ViewBuilder
-    func InputsRegisterView() -> some View {
+    func inputsRegisterView() -> some View {
         VStack(alignment: .leading) {
             CustomTextField(
                 text: $vm.emailTxt,
@@ -92,7 +101,7 @@ struct RegisterView: View {
     }
     
     @ViewBuilder
-    func BtnRegisterView() -> some View {
+    func btnRegisterView() -> some View {
         CustomBtn(txt: "Inscrever-se", colorBtn: .mainBlue) {
             if vm.validateAll() {
                 session.isWaitingRegisterConfirmation = true
@@ -104,7 +113,7 @@ struct RegisterView: View {
     }
     
     @ViewBuilder
-    func BtnHasAccountView() -> some View {
+    func btnHasAccountView() -> some View {
         TextBtn(txt: "Já possui conta? Entre") {
             dismiss()
         }

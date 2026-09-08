@@ -13,12 +13,12 @@ private struct LoadingView: View {
     var body: some View {
         ZStack {
             Color.black
-                .opacity(0.45)
+                .opacity(0.60)
             
             VStack(spacing: 18) {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .scaleEffect(1.5)
+                    .scaleEffect(1.7)
                 
                 if let message {
                     Text(message)
@@ -26,10 +26,10 @@ private struct LoadingView: View {
                         .font(.myFont(style: .body, weight: .regular))
                 }
             }
-            .padding(24)
+            .padding(28)
             .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.black.opacity(0.6))
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.black.opacity(0.8))
             )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
