@@ -11,16 +11,22 @@ import FirebaseCore
 
 @main
 struct FlowPocketApp: App {
-    let coreDataManager = CoreDataManager.shared
+    @StateObject private var transactionsStore: TransactionsStore
 
     init() {
         FirebaseApp.configure()
+        let coreDataManager = CoreDataManager.shared
+        _transactionsStore = StateObject(
+            wrappedValue: TransactionsStore(
+                context: coreDataManager.container.viewContext
+            )
+        )
     }
     
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environment(\.managedObjectContext, coreDataManager.container.viewContext)
+                .environmentObject(transactionsStore)
         }
     }
 }

@@ -9,97 +9,139 @@ import SwiftUI
 import CoreData
 
 struct TransactionsView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Transaction.date, ascending: true)],
-        animation: .default
-    ) private var transactions: FetchedResults<Transaction>
+    @EnvironmentObject private var transactionsStore: TransactionsStore
+    @State private var editMode: Bool = false
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(transactions) { trans in
-                    NavigationLink {
-                        Group {
-                            Text("Adicionado em: \(trans.date!, formatter: itemFormatter)")
-                            Text("Name: \(trans.name!)")
-                            Text("Tipo: \(trans.type!)")
-                            Text("Valor: \(trans.value!)")
-                            Text("Categoria: \(trans.category!)")
-                        }
-                        .font(.myFont(size: 20))
-                    } label: {
-                        Text(trans.date!, formatter: itemFormatter)
-                            .font(.myFont(style: .body, weight: .regular))
-                    }
+                ForEach(transactionsStore.transactions) { transaction in
+                    transactionDetails(transaction)
                 }
                 .onDelete(perform: deleteItems)
+
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.bg)
+            .animation(.easeInOut(duration: 0.2), value: transactionsStore.transactions.count)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
+                    editButton()
                 }
-                ToolbarItem {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
             }
-            Text("Select an item")
         }
     }
-    
+
+    // MARK: - View Builders
+    @ViewBuilder
+    private func editButton() -> some View {
+        if editMode {
+            Button {
+                editMode.toggle()
+            } label: {
+                Image(systemName: "checkmark")
+            }
+            .buttonStyle(.borderedProminent)
+        } else {
+            Button {
+                editMode.toggle()
+            } label: {
+                Text("Edit")
+                    .font(.myFont(style: .body, weight: .regular))
+            }
+            .buttonStyle(.automatic)
+        }
+    }
+
+    @ViewBuilder
+    private func transactionDetails(_ transaction: Transaction) -> some View {
+        NavigationLink {
+            Group {
+                Text("Adicionado em: \(transaction.date ?? .now, formatter: itemFormatter)")
+                Text("Name: \(transaction.name ?? "Sem nome")")
+                Text("Tipo: \(transaction.type ?? "Sem tipo")")
+                Text("Valor: \(transaction.value?.stringValue ?? "0")")
+                Text("Categoria: \(transaction.category ?? "Sem categoria")")
+            }
+            .font(.myFont(size: 20))
+        } label: {
+            HStack {
+                Text(transaction.date ?? .now, formatter: itemFormatter)
+                    .font(.myFont(style: .body, weight: .regular))
+                Spacer()
+                Image(systemName: editMode ? "minus.circle.fill" : "applepencil.gen1")
+                    .font(.myFont(style: .title3, weight: .regular))
+                    .frame(width: 24, height: 24)
+                    .contentShape(Rectangle())
+                    .foregroundStyle(editMode ? .red : .primary)
+                    .contentTransition(.symbolEffect(.replace))
+                    .animation(.easeInOut(duration: 0.2), value: editMode)
+                    .onTapGesture {
+                        if editMode {
+                            transactionsStore.delete(transaction)
+                        } else {
+                            //EditTransaction
+                        }
+                    }
+            }
+        }
+        .navigationLinkIndicatorVisibility(.hidden)
+        .listRowBackground(Color.backdrop)
+        .padding(.vertical, 5)
+    }
+
     // MARK: - Funcs
     private func addItem() {
         withAnimation {
-            let newItem = Transaction(context: viewContext)
-            newItem.date = Date()
-            newItem.name = "Teste"
-            newItem.type = "Gasto"
-            newItem.value = NSDecimalNumber(decimal: Decimal(50.00))
-            newItem.category = "Mercado"
-            
-            do {
-                try viewContext.save()
-            } catch {
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+            transactionsStore.create(
+                name: "Teste",
+                type: "Gasto",
+                value: 50,
+                category: "Mercado"
+            )
         }
     }
     
     private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { transactions[$0] }.forEach(viewContext.delete)
-            
-            do {
-                try viewContext.save()
-            } catch {
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            transactionsStore.delete(at: offsets)
         }
     }
+
 }
 
 // MARK: - Helpers
 private let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .short
-    formatter.timeStyle = .medium
+    formatter.timeStyle = .short
     return formatter
 }()
 
 
 // MARK: - Preview
-struct TransactionsView_Preview: PreviewProvider {
-    static let previewContext = CoreDataManager.shared.container.viewContext
-    
-    static var previews: some View {
-        NavigationView {
-            TransactionsView()
-                .environment(\.managedObjectContext, previewContext)
-        }
+private struct TransactionsView_PreviewContainer: View {
+    var body: some View {
+        TransactionsView()
+            .environmentObject(
+                TransactionsStore(
+                    context: CoreDataManager.shared.container.viewContext
+                )
+            )
     }
+}
+
+#Preview("Light Mode") {
+    TransactionsView_PreviewContainer()
+        .preferredColorScheme(.light)
+}
+
+#Preview("Dark Mode") {
+    TransactionsView_PreviewContainer()
+        .preferredColorScheme(.dark)
 }

@@ -45,7 +45,9 @@ struct ContentTabView_Preview: PreviewProvider {
     static var previews: some View {
         NavigationView {
             ContentTabView()
-                .environment(\.managedObjectContext, previewContext)
+                .environmentObject(
+                    TransactionsStore(context: previewContext)
+                )
         }
     }
 }
