@@ -33,8 +33,8 @@ final class TransactionsStore: ObservableObject {
     }
 
     func create(
-        name: String,
         type: String,
+        title: String,
         value: Decimal,
         category: String,
         date: Date = .now
@@ -42,8 +42,8 @@ final class TransactionsStore: ObservableObject {
         perform {
             let transaction = Transaction(context: context)
             apply(
-                name: name,
                 type: type,
+                title: title,
                 value: value,
                 category: category,
                 date: date,
@@ -55,16 +55,16 @@ final class TransactionsStore: ObservableObject {
 
     func update(
         _ transaction: Transaction,
-        name: String,
         type: String,
+        title: String,
         value: Decimal,
         category: String,
         date: Date
     ) {
         perform {
             apply(
-                name: name,
                 type: type,
+                title: title,
                 value: value,
                 category: category,
                 date: date,
@@ -107,15 +107,15 @@ final class TransactionsStore: ObservableObject {
     }
 
     private func apply(
-        name: String,
         type: String,
+        title: String,
         value: Decimal,
         category: String,
         date: Date,
         to transaction: Transaction
     ) {
-        transaction.name = name
         transaction.type = type
+        transaction.title = title
         transaction.value = NSDecimalNumber(decimal: value)
         transaction.category = category
         transaction.date = date

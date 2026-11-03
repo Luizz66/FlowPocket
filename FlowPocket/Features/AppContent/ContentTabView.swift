@@ -39,15 +39,24 @@ struct ContentTabView: View {
     }
 }
 
-struct ContentTabView_Preview: PreviewProvider {
-    static let previewContext = CoreDataManager.shared.container.viewContext
-    
-    static var previews: some View {
-        NavigationView {
-            ContentTabView()
-                .environmentObject(
-                    TransactionsStore(context: previewContext)
+// MARK: - Preview
+private struct ContentTabView_PreviewContainer: View {
+    var body: some View {
+        ContentTabView()
+            .environmentObject(
+                TransactionsStore(
+                    context: CoreDataManager.shared.container.viewContext
                 )
-        }
+            )
     }
+}
+
+#Preview("Light Mode") {
+    ContentTabView_PreviewContainer()
+        .preferredColorScheme(.light)
+}
+
+#Preview("Dark Mode") {
+    ContentTabView_PreviewContainer()
+        .preferredColorScheme(.dark)
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 class Icons {
-    func sfSymbol(type: Category.income) -> String {
+    func sfSymbol(type: Income) -> String {
         switch type {
         case .salario:
             return "brazilianrealsign.arrow.trianglehead.counterclockwise.rotate.90"
@@ -27,7 +27,7 @@ class Icons {
         }
     }
     
-    func sfSymbol(type: Category.expense) -> String {
+    func sfSymbol(type: Expense) -> String {
         switch type {
         case .casa:
             return "house"

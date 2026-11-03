@@ -10,7 +10,10 @@ import CoreData
 
 struct TransactionsView: View {
     @EnvironmentObject private var transactionsStore: TransactionsStore
+
     @State private var editMode: Bool = false
+    @State private var goEdit: Bool = false
+    @State private var goAdd: Bool = false
     
     var body: some View {
         NavigationView {
@@ -29,10 +32,22 @@ struct TransactionsView: View {
                     editButton()
                 }
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+                    addButton()
                 }
+            }
+        }
+        .sheet(isPresented: $goEdit) {
+            NavigationStack {
+                EditTransaction()
+                    .navigationTitle("Editar transação")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+        .sheet(isPresented: $goAdd) {
+            NavigationStack {
+                AddNewTransactionView()
+                    .navigationTitle("Adicionar nova transação")
+                    .navigationBarTitleDisplayMode(.inline)
             }
         }
     }
@@ -57,13 +72,22 @@ struct TransactionsView: View {
             .buttonStyle(.automatic)
         }
     }
+    
+    @ViewBuilder
+    private func addButton() -> some View {
+        Button {
+            goAdd = true
+        } label: {
+            Image(systemName: "plus")
+        }
+    }
 
     @ViewBuilder
     private func transactionDetails(_ transaction: Transaction) -> some View {
         NavigationLink {
             Group {
                 Text("Adicionado em: \(transaction.date ?? .now, formatter: itemFormatter)")
-                Text("Name: \(transaction.name ?? "Sem nome")")
+                Text("Título: \(transaction.title ?? "Sem título")")
                 Text("Tipo: \(transaction.type ?? "Sem tipo")")
                 Text("Valor: \(transaction.value?.stringValue ?? "0")")
                 Text("Categoria: \(transaction.category ?? "Sem categoria")")
@@ -71,7 +95,7 @@ struct TransactionsView: View {
             .font(.myFont(size: 20))
         } label: {
             HStack {
-                Text(transaction.date ?? .now, formatter: itemFormatter)
+                Text("Título: \(transaction.title ?? "Sem título")")
                     .font(.myFont(style: .body, weight: .regular))
                 Spacer()
                 Image(systemName: editMode ? "minus.circle.fill" : "applepencil.gen1")
@@ -85,7 +109,7 @@ struct TransactionsView: View {
                         if editMode {
                             transactionsStore.delete(transaction)
                         } else {
-                            //EditTransaction
+                            goEdit = true
                         }
                     }
             }
@@ -93,20 +117,10 @@ struct TransactionsView: View {
         .navigationLinkIndicatorVisibility(.hidden)
         .listRowBackground(Color.backdrop)
         .padding(.vertical, 5)
+        
     }
 
     // MARK: - Funcs
-    private func addItem() {
-        withAnimation {
-            transactionsStore.create(
-                name: "Teste",
-                type: "Gasto",
-                value: 50,
-                category: "Mercado"
-            )
-        }
-    }
-    
     private func deleteItems(offsets: IndexSet) {
         withAnimation(.easeInOut(duration: 0.2)) {
             transactionsStore.delete(at: offsets)
